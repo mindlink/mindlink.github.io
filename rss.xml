@@ -1,2 +1,157 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Engineering at MindLink]]></title><description><![CDATA[Insights and musings from the MindLink software engineers]]></description><link>https://engineering.mindlinksoft.com</link><generator>RSS for Node</generator><lastBuildDate>Thu, 12 Apr 2018 16:39:04 GMT</lastBuildDate><item><title><![CDATA[Hello World]]></title><description><![CDATA[Welcome to the MindLink engineering blog. This is the first of hopefully many posts by the MindLink engineering team, looking to discuss ]]></description><link>https://engineering.mindlinksoft.comhello-world</link><guid isPermaLink="false">https://engineering.mindlinksoft.comhello-world</guid><pubDate>Wed, 10 Apr 2019 17:52:00 GMT</pubDate><content:encoded>&lt;p&gt;Welcome to the MindLink engineering blog.&lt;/p&gt;
-&lt;p&gt;This is the first of hopefully many posts by the MindLink engineering team, looking to discuss &lt;/p&gt;</content:encoded></item></channel></rss>
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Engineering at MindLink]]></title><description><![CDATA[Insights and musings from the MindLink software engineers]]></description><link>https://engineering.mindlinksoft.com</link><generator>RSS for Node</generator><lastBuildDate>Fri, 13 Apr 2018 10:50:37 GMT</lastBuildDate><item><title><![CDATA[Publishing to GitHub Pages from TFS]]></title><description><![CDATA[Recently we decided it was time to publish our own blog to showcase some of what our talented engineers do and find interesting. To do this…]]></description><link>https://engineering.mindlinksoft.compublishing-to-github-pages-from-tfs</link><guid isPermaLink="false">https://engineering.mindlinksoft.compublishing-to-github-pages-from-tfs</guid><pubDate>Sat, 13 Apr 2019 10:09:00 GMT</pubDate><content:encoded>&lt;p&gt;Recently we decided it was time to publish our own blog to showcase some of what our talented engineers do and find interesting. To do this with the existing tools and as cheaply and quickly as possible we needed to link Team Foundation Server (TFS) to GitHub Pages.&lt;/p&gt;
+&lt;h2&gt;TL;DR&lt;/h2&gt;
+&lt;p&gt;To deploy from TFS to GitHub pages:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Install the &lt;code class=&quot;language-text&quot;&gt;gh-pages&lt;/code&gt; npm module &lt;/li&gt;
+&lt;li&gt;Define an npm script to run gh-pages e.g. &lt;code class=&quot;language-text&quot;&gt;“deploy”: “gh-pages -d public”&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Use TFS secure variables to inject a GitHub personal token into &lt;code class=&quot;language-text&quot;&gt;gh-pages&lt;/code&gt; call &lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Combined this means defining a build step of the form&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code class=&quot;language-text&quot;&gt;npm run deploy — -r https://$(GH_TOKEN)@github.com/user/repository.git&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;The &lt;code class=&quot;language-text&quot;&gt;—&lt;/code&gt; (that’s a double &lt;code class=&quot;language-text&quot;&gt;-&lt;/code&gt;) tells npm that it should forward what follows as additional script arguments &lt;/li&gt;
+&lt;li&gt;The &lt;code class=&quot;language-text&quot;&gt;-r&lt;/code&gt; is the &lt;code class=&quot;language-text&quot;&gt;gh-pages&lt;/code&gt; argument for defining an alternative repository &lt;/li&gt;
+&lt;li&gt;The &lt;code class=&quot;language-text&quot;&gt;$(GH_TOKEN)&lt;/code&gt; will be replaced by TFS with the value of the variable called &lt;code class=&quot;language-text&quot;&gt;GH_TOKEN&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2&gt;Onward to a continuously deployed blog&lt;/h2&gt;
+&lt;p&gt;Here at MindLink we use Microsoft Team Foundation Server to host our source in a git repository, manage the build and release process and track our iterations. It’s all nice and integrated!&lt;/p&gt;
+&lt;p&gt;We wanted to keep ownership of the blogging platform as seems to be the trend, as opposed to using a service like &lt;a href=&quot;https://www.medium.com&quot;&gt;medium&lt;/a&gt;. The main reason for this is that by having control we also gain the ability to change where we publish and how we publish in future.&lt;/p&gt;
+&lt;p&gt;GitHub pages struck us as the perfect platform for a low cost (&lt;em&gt;free&lt;/em&gt;) way to publish a blog and is widely used for such a purpose. It also has a simple way to publish a site - simply push a static site to a specific repository (or gh-pages branch in a project repository). You can read more about GitHub pages &lt;a href=&quot;https://pages.github.com/&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;What we wanted was a simple way to write a blog post and automatically publish it using the tools our engineers use every day.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;This will give it a low barrier to entry and encourage all the development team to contribute!&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;As TFS was our existing git repository host and build system it made sense to leverage that for the blog source and release mechanism. Getting TFS to publish a built static site to GitHub is not so straight forward.&lt;/p&gt;
+&lt;p&gt;With a static site generator (&lt;a href=&quot;https://www.gatsbyjs.org/&quot;&gt;gatsby&lt;/a&gt; in this case) it’s easy to take a source tree and build a static site. That’s step 1.&lt;/p&gt;
+&lt;p&gt;To take that static site and publish it to GitHub when you’re not already in a GitHub repository is less straight-forward, but still perfectly doable!&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Use the &lt;code class=&quot;language-text&quot;&gt;gh-pages&lt;/code&gt; npm module to publish &lt;/li&gt;
+&lt;li&gt;Use an npm script to define the standard &lt;code class=&quot;language-text&quot;&gt;gh-pages&lt;/code&gt; script &lt;/li&gt;
+&lt;li&gt;Get TFS build to run the npm script and inject the GitHub credentials and target repository &lt;/li&gt;
+&lt;li&gt;Setup the build triggers to either run on every commit, schedule it or do something else &lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;I’d probably also suggest splitting the build and release phases if you’re worried about publishing potentially broken sites. Since TFS has a fairly powerful build and release mechanism you can get a process that works for you!&lt;/p&gt;
+&lt;h2&gt;The details&lt;/h2&gt;
+&lt;p&gt;I’m going to assume the following:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;You already have a script to build the static site (maybe an npm script or gulp or grunt process) &lt;/li&gt;
+&lt;li&gt;The static site is built to &lt;code class=&quot;language-text&quot;&gt;/public&lt;/code&gt; in the root directory &lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3&gt;Setup gh-pages npm script&lt;/h3&gt;
+&lt;p&gt;The first step is to install the node modules we will need (I’m using yarn here but it will work just as well with npm install): &lt;code class=&quot;language-text&quot;&gt;yarn add gh-pages&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;With that installed we’ll now specify an npm script to publish the built static site (you could just as easily do this with a task runner like gulp or grunt instead, the trick is in injecting the GitHub key):&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot;&gt;
+      &lt;pre class=&quot;language-json&quot;&gt;&lt;code class=&quot;language-json&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+    ...&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;token property&quot;&gt;&quot;scripts&quot;&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        ...&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;token property&quot;&gt;&quot;deploy&quot;&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;gh-pages -d public&quot;&lt;/span&gt;
+    &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+      &lt;/div&gt;
+&lt;p&gt;This tells &lt;code class=&quot;language-text&quot;&gt;gh-pages&lt;/code&gt; to run using only the “public” folder. With only this configuration it will add a branch called gh-pages to the current repository.&lt;/p&gt;
+&lt;h3&gt;Get TFS Build to run the script&lt;/h3&gt;
+&lt;p&gt;For the second step we need to tell TFS build to run this script and target a GitHub repository instead!&lt;/p&gt;
+&lt;p&gt;Get yourself a personal access token from GitHub by going to &lt;a href=&quot;https://github.com/settings/tokens&quot;&gt;github token settings for your account&lt;/a&gt; and creating a new access token. Make sure you give it permission to read and write to public repositories. Copy that token and don’t lose it!&lt;/p&gt;
+&lt;p&gt;Now go to your TFS build configuration and select the variables tab. Add the token as a secure variable with any name you like - here we use &lt;code class=&quot;language-text&quot;&gt;GH_TOKEN&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;
+  &lt;a
+    class=&quot;gatsby-resp-image-link&quot;
+    href=&quot;/static/tfs-variables-576181a66ba553dcf1f9105718fcbac9-eeb2a.jpg&quot;
+    style=&quot;display: block&quot;
+    target=&quot;_blank&quot;
+    rel=&quot;noopener&quot;
+  &gt;
+  
+  &lt;span
+    class=&quot;gatsby-resp-image-wrapper&quot;
+    style=&quot;position: relative; display: block; ; max-width: 590px; margin-left: auto; margin-right: auto;&quot;
+  &gt;
+    &lt;span
+      class=&quot;gatsby-resp-image-background-image&quot;
+      style=&quot;padding-bottom: 30.13270882123341%; position: relative; bottom: 0; left: 0; background-image: url(&apos;data:image/jpeg;base64,/9j/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wgARCAAGABQDASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAAAAEF/8QAFAEBAAAAAAAAAAAAAAAAAAAAAP/aAAwDAQACEAMQAAAB34FB/8QAFhAAAwAAAAAAAAAAAAAAAAAAABAR/9oACAEBAAEFAiL/xAAUEQEAAAAAAAAAAAAAAAAAAAAQ/9oACAEDAQE/AT//xAAUEQEAAAAAAAAAAAAAAAAAAAAQ/9oACAECAQE/AT//xAAWEAADAAAAAAAAAAAAAAAAAAAAEDH/2gAIAQEABj8CKv/EABgQAQEAAwAAAAAAAAAAAAAAABEBABBh/9oACAEBAAE/IQyqqnNf/9oADAMBAAIAAwAAABADz//EABQRAQAAAAAAAAAAAAAAAAAAABD/2gAIAQMBAT8QP//EABQRAQAAAAAAAAAAAAAAAAAAABD/2gAIAQIBAT8QP//EABsQAQACAgMAAAAAAAAAAAAAAAEAETFBYZGh/9oACAEBAAE/EAYX3GEGNKp8ic1P/9k=&apos;); background-size: cover; display: block;&quot;
+    &gt;
+      &lt;img
+        class=&quot;gatsby-resp-image-image&quot;
+        style=&quot;width: 100%; height: 100%; margin: 0; vertical-align: middle; position: absolute; top: 0; left: 0; box-shadow: inset 0px 0px 0px 400px white;&quot;
+        alt=&quot;TFS Variables&quot;
+        title=&quot;&quot;
+        src=&quot;/static/tfs-variables-576181a66ba553dcf1f9105718fcbac9-f8fb9.jpg&quot;
+        srcset=&quot;/static/tfs-variables-576181a66ba553dcf1f9105718fcbac9-e8976.jpg 148w,
+/static/tfs-variables-576181a66ba553dcf1f9105718fcbac9-63df2.jpg 295w,
+/static/tfs-variables-576181a66ba553dcf1f9105718fcbac9-f8fb9.jpg 590w,
+/static/tfs-variables-576181a66ba553dcf1f9105718fcbac9-85e3d.jpg 885w,
+/static/tfs-variables-576181a66ba553dcf1f9105718fcbac9-d1924.jpg 1180w,
+/static/tfs-variables-576181a66ba553dcf1f9105718fcbac9-eeb2a.jpg 1281w&quot;
+        sizes=&quot;(max-width: 590px) 100vw, 590px&quot;
+      /&gt;
+    &lt;/span&gt;
+  &lt;/span&gt;
+  
+  &lt;/a&gt;
+    &lt;/p&gt;
+&lt;p&gt;Next add a new build step to run our deploy script as below:&lt;/p&gt;
+&lt;p&gt;
+  &lt;a
+    class=&quot;gatsby-resp-image-link&quot;
+    href=&quot;/static/tfs-build-step-c2afb440c28667ee9f1dad68b0d9466c-d6369.jpg&quot;
+    style=&quot;display: block&quot;
+    target=&quot;_blank&quot;
+    rel=&quot;noopener&quot;
+  &gt;
+  
+  &lt;span
+    class=&quot;gatsby-resp-image-wrapper&quot;
+    style=&quot;position: relative; display: block; ; max-width: 590px; margin-left: auto; margin-right: auto;&quot;
+  &gt;
+    &lt;span
+      class=&quot;gatsby-resp-image-background-image&quot;
+      style=&quot;padding-bottom: 46.334310850439884%; position: relative; bottom: 0; left: 0; background-image: url(&apos;data:image/jpeg;base64,/9j/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wgARCAAJABQDASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAAAQAF/8QAFAEBAAAAAAAAAAAAAAAAAAAAAP/aAAwDAQACEAMQAAAB3mQmP//EABQQAQAAAAAAAAAAAAAAAAAAACD/2gAIAQEAAQUCX//EABQRAQAAAAAAAAAAAAAAAAAAABD/2gAIAQMBAT8BP//EABQRAQAAAAAAAAAAAAAAAAAAABD/2gAIAQIBAT8BP//EABQQAQAAAAAAAAAAAAAAAAAAACD/2gAIAQEABj8CX//EABUQAQEAAAAAAAAAAAAAAAAAAAEQ/9oACAEBAAE/IRpf/9oADAMBAAIAAwAAABCAD//EABQRAQAAAAAAAAAAAAAAAAAAABD/2gAIAQMBAT8QP//EABQRAQAAAAAAAAAAAAAAAAAAABD/2gAIAQIBAT8QP//EABgQAAIDAAAAAAAAAAAAAAAAAAAQETFB/9oACAEBAAE/EMCVR//Z&apos;); background-size: cover; display: block;&quot;
+    &gt;
+      &lt;img
+        class=&quot;gatsby-resp-image-image&quot;
+        style=&quot;width: 100%; height: 100%; margin: 0; vertical-align: middle; position: absolute; top: 0; left: 0; box-shadow: inset 0px 0px 0px 400px white;&quot;
+        alt=&quot;TFS Build Step&quot;
+        title=&quot;&quot;
+        src=&quot;/static/tfs-build-step-c2afb440c28667ee9f1dad68b0d9466c-f8fb9.jpg&quot;
+        srcset=&quot;/static/tfs-build-step-c2afb440c28667ee9f1dad68b0d9466c-e8976.jpg 148w,
+/static/tfs-build-step-c2afb440c28667ee9f1dad68b0d9466c-63df2.jpg 295w,
+/static/tfs-build-step-c2afb440c28667ee9f1dad68b0d9466c-f8fb9.jpg 590w,
+/static/tfs-build-step-c2afb440c28667ee9f1dad68b0d9466c-85e3d.jpg 885w,
+/static/tfs-build-step-c2afb440c28667ee9f1dad68b0d9466c-d6369.jpg 1023w&quot;
+        sizes=&quot;(max-width: 590px) 100vw, 590px&quot;
+      /&gt;
+    &lt;/span&gt;
+  &lt;/span&gt;
+  
+  &lt;/a&gt;
+    &lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot;&gt;
+      &lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;Type: npm
+Run: custom
+Arguments: deploy — -b master -r https://$(GH_TOKEN)@github.com/MindLink/MindLink.github.io.git&lt;/code&gt;&lt;/pre&gt;
+      &lt;/div&gt;
+&lt;p&gt;That’s it! TFS build will run the npm script “deploy” and pass additional arguments:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code class=&quot;language-text&quot;&gt;-b master&lt;/code&gt; =&gt; publish to the master branch of the repository&lt;/li&gt;
+&lt;li&gt;&lt;code class=&quot;language-text&quot;&gt;-r https://$(GH_TOKEN)@&amp;lt;repository&amp;gt;&lt;/code&gt; =&gt; publish to a repository using the personal token (which allows you to publish without a user/pass) &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Now whenever you trigger the build it will publish a new version of your static site to GitHub Pages.&lt;/p&gt;
+&lt;h3&gt;Wrap up&lt;/h3&gt;
+&lt;p&gt;This is the exactly how we have started doing it. Right now our team has total freedom to push updates to the blog with continuous deployment, in future that may change to a more managed release process, but our aim is to get our content out with as few steps as possible!&lt;/p&gt;
+&lt;p&gt;If you’re interested the full process for somebody to post an article to our blog is:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Checkout the blog source &lt;/li&gt;
+&lt;li&gt;Add an author yaml entry if they’ve not already got one &lt;/li&gt;
+&lt;li&gt;Add a new post folder with a unique name &lt;/li&gt;
+&lt;li&gt;Add a markdown article with front matter (author, title, date and tags) &lt;/li&gt;
+&lt;li&gt;Run it locally first if you like &lt;/li&gt;
+&lt;li&gt;Commit and push &lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;We could distil this further, but we shall see how we get on! A couple of ideas are:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;don’t require a separate folder, so you just create the markdown article and push &lt;/li&gt;
+&lt;li&gt;Support drafts so you can push without publishing, but still view in develop &lt;/li&gt;
+&lt;/ul&gt;</content:encoded></item></channel></rss>
