@@ -20,9 +20,13 @@
       "component---src-layouts-index-js-245860cfc6d5eb99f3d3.js",
       "component---src-layouts-index-js-245860cfc6d5eb99f3d3.js.map"
     ],
+    "path---why-draftjs-doesnt-work-on-android": [
+      "path---why-draftjs-doesnt-work-on-android-eea61be93843b602cae7.js",
+      "path---why-draftjs-doesnt-work-on-android-eea61be93843b602cae7.js.map"
+    ],
     "path---index": [
-      "path---index-12da1fed705da8afff0d.js",
-      "path---index-12da1fed705da8afff0d.js.map"
+      "path---index-6bc463e12bc91c134e9d.js",
+      "path---index-6bc463e12bc91c134e9d.js.map"
     ],
     "component---src-pages-404-js": [
       "component---src-pages-404-js-4503918ea3a16cfcdb75.js",
@@ -43,14 +47,14 @@
       "path---offline-plugin-app-shell-fallback-a0e39f21c11f6a62c5ab.js.map"
     ],
     "app": [
-      "app-f09b8bfc4f6ac784fd5e.js",
+      "app-28ab5bc39841f6533418.js",
       "build-js-styles.css",
-      "app-f09b8bfc4f6ac784fd5e.js.map",
+      "app-28ab5bc39841f6533418.js.map",
       "build-js-styles.css.map"
     ],
     "path---publishing-to-github-pages-from-tfs": [
-      "path---publishing-to-github-pages-from-tfs-8d8f047bcab9a95aab02.js",
-      "path---publishing-to-github-pages-from-tfs-8d8f047bcab9a95aab02.js.map"
+      "path---publishing-to-github-pages-from-tfs-e7e94382e24be0516e0d.js",
+      "path---publishing-to-github-pages-from-tfs-e7e94382e24be0516e0d.js.map"
     ],
     "path---404": [
       "path---404-a0e39f21c11f6a62c5ab.js",
