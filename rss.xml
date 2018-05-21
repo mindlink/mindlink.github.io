@@ -1,4 +1,164 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Engineering at MindLink]]></title><description><![CDATA[Insights and musings from the MindLink software engineers]]></description><link>https://engineering.mindlinksoft.com</link><generator>RSS for Node</generator><lastBuildDate>Tue, 08 May 2018 12:47:01 GMT</lastBuildDate><item><title><![CDATA[Why DraftJS doesn't work on Android]]></title><description><![CDATA[DraftJS  is a popular open source rich text editing library for React maintained by Facebook. It allows developers to decorate input text as…]]></description><link>https://engineering.mindlinksoft.comwhy-draftjs-doesnt-work-on-android</link><guid isPermaLink="false">https://engineering.mindlinksoft.comwhy-draftjs-doesnt-work-on-android</guid><pubDate>Sun, 22 Apr 2018 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;&lt;a href=&quot;https://draftjs.org/&quot;&gt;DraftJS&lt;/a&gt; is a popular open source rich text editing library for React maintained by Facebook. It allows developers to decorate input text as the user types, and provides a way to embed metadata into the decorated text (e.g. a URL.) Also supports commands, keyboard shortcuts …&lt;/p&gt;
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Engineering at MindLink]]></title><description><![CDATA[Insights and musings from the MindLink software engineers]]></description><link>https://engineering.mindlinksoft.com</link><generator>RSS for Node</generator><lastBuildDate>Mon, 21 May 2018 16:20:02 GMT</lastBuildDate><item><title><![CDATA[Custom content in a Skype for Business conversation]]></title><description><![CDATA[At MindLink we like to take current trends in messaging and see if we can get more out of Skype for Business (SfB) by supporting them. This…]]></description><link>https://engineering.mindlinksoft.comcustom-content-in-a-skype-for-business-conversation</link><guid isPermaLink="false">https://engineering.mindlinksoft.comcustom-content-in-a-skype-for-business-conversation</guid><pubDate>Mon, 21 May 2018 10:15:00 GMT</pubDate><content:encoded>&lt;p&gt;At MindLink we like to take current trends in messaging and see if we can get more out of Skype for Business (SfB) by supporting them. This week with our intern Daniel I’ve been investigating how to display rich custom content i.e. cards, in channels while having fallback content for other clients that don’t understand the rich content.&lt;/p&gt;
+&lt;h2&gt;TL;DR&lt;/h2&gt;
+&lt;p&gt;We have made it possible to bring rich content cards as seen in many popular trendy chat platforms to existing Skype for Business deployments, further extending the value of SfB!&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2&gt;Getting custom data inside a SfB message&lt;/h2&gt;
+&lt;p&gt;Skype for Business channels are known as Persistent Chat groups in SfB speak. They support sending Rich Text Format (RTF), but the native clients will reject unrecognised/malformed RTF and display a very specific subset of the RTF content. This is also true for 1-1 conversations.&lt;/p&gt;
+&lt;p&gt;Fortunately RTF is pretty well documented, what we need is some way to send RTF that can have some non-RTF content and a fallback if that content isn’t supported.&lt;/p&gt;
+&lt;p&gt;Enter the &lt;code class=&quot;language-text&quot;&gt;\object&lt;/code&gt; block! The RTF specification describes this as a block for representing OLE objects, where the object is a base64 encoded OLE stream and there are other blocks for defining the type and importantly the RTF “result” should the object not be supported. See the &lt;a href=&quot;http://www.biblioscape.com/rtf15_spec.htm#Heading50&quot;&gt;RTF Specification&lt;/a&gt; for more details.&lt;/p&gt;
+&lt;p&gt;By using our framework we were able to insert a test object to see how the SfB client reacts to such a definition. As expected and conforming to the RTF specification the client renders only the RTF result of the object. The format we used to achieve this within an RTF message was:&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot;&gt;
+      &lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;{\object \objemb {*\objclass MindLinkCard} {*\objdata &amp;lt;data&amp;gt;} {\result &amp;lt;fallback&amp;gt;}}&lt;/code&gt;&lt;/pre&gt;
+      &lt;/div&gt;
+&lt;p&gt;Using this as a starting point we defined a common representation for structured JSON data that we would encode as the object data (replacing &lt;code class=&quot;language-text&quot;&gt;&amp;lt;data&amp;gt;&lt;/code&gt; above). We then extended our core application to allow the sending of a restricted set of rich content cards, ensuring that the fallback RTF result is populated with a textual description of the content, replacing &lt;code class=&quot;language-text&quot;&gt;&amp;lt;fallback&amp;gt;&lt;/code&gt; above e.g. inserting a support ticket might render “see ticket &lt;a href=&quot;https://support.company.com/ticket/AT-123%22&quot;&gt;https://support.company.com/ticket/AT-123”&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;We then enhanced our client to be able to send these rich content cards and display rich content in the message history instead of the fallback text!&lt;/p&gt;
+&lt;p&gt;What’s more is that we made this extensible, so it’s possible to load client extensions to send other rich content cards! This opens up the possibility for more intuitive line of business workflows right within your conversations.&lt;/p&gt;
+&lt;p&gt;Expect to see us leverage this new extensibility in sample integrations with other line-of-business applications.&lt;/p&gt;
+&lt;h2&gt;Example use case - Giphy&lt;/h2&gt;
+&lt;p&gt;While we work on more advanced integrations, here’s an example popular integration with &lt;a href=&quot;https://www.giphy.com&quot;&gt;Giphy&lt;/a&gt; that is a very simple showcase of what these new capabilities can provide. Imagine linking this into line-of-business applications that show dynamic data or allow actions to be taken with the click of a button from right within the conversation.&lt;/p&gt;
+&lt;p&gt;Our work-in-progress extensibility API allows an extension to load a popup for composing a message card, as shown below.&lt;/p&gt;
+&lt;p&gt;
+  &lt;a
+    class=&quot;gatsby-resp-image-link&quot;
+    href=&quot;/static/popup-a6c66713b004436b5ee92bfae218fe0b-0de24.jpg&quot;
+    style=&quot;display: block&quot;
+    target=&quot;_blank&quot;
+    rel=&quot;noopener&quot;
+  &gt;
+  
+  &lt;span
+    class=&quot;gatsby-resp-image-wrapper&quot;
+    style=&quot;position: relative; display: block; ; max-width: 590px; margin-left: auto; margin-right: auto;&quot;
+  &gt;
+    &lt;span
+      class=&quot;gatsby-resp-image-background-image&quot;
+      style=&quot;padding-bottom: 68.31896551724138%; position: relative; bottom: 0; left: 0; background-image: url(&apos;data:image/jpeg;base64,/9j/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wgARCAAOABQDASIAAhEBAxEB/8QAGAAAAgMAAAAAAAAAAAAAAAAAAAQCAwX/xAAVAQEBAAAAAAAAAAAAAAAAAAAAAf/aAAwDAQACEAMQAAAB2IMUiY2S/wD/xAAaEAEAAgMBAAAAAAAAAAAAAAACAQMAEBIT/9oACAEBAAEFAuBjisH1qnVtfZIkx//EABQRAQAAAAAAAAAAAAAAAAAAABD/2gAIAQMBAT8BP//EABQRAQAAAAAAAAAAAAAAAAAAABD/2gAIAQIBAT8BP//EABsQAAIBBQAAAAAAAAAAAAAAAAARARASMjOh/9oACAEBAAY/AsYHZBq5RNCZ/8QAHBAAAwABBQAAAAAAAAAAAAAAAAERITFhceHx/9oACAEBAAE/IfLKDHhC6ESjFSyulElMVsf/2gAMAwEAAgADAAAAEPAv/8QAFREBAQAAAAAAAAAAAAAAAAAAACH/2gAIAQMBAT8QR//EABQRAQAAAAAAAAAAAAAAAAAAABD/2gAIAQIBAT8QP//EABsQAQEAAwADAAAAAAAAAAAAAAERACFBMcHh/9oACAEBAAE/EJO3runLReoHL3DFNTWkPF94uEmDyDY4GXQhfrP/2Q==&apos;); background-size: cover; display: block;&quot;
+    &gt;
+      &lt;img
+        class=&quot;gatsby-resp-image-image&quot;
+        style=&quot;width: 100%; height: 100%; margin: 0; vertical-align: middle; position: absolute; top: 0; left: 0; box-shadow: inset 0px 0px 0px 400px white;&quot;
+        alt=&quot;Composing Popup&quot;
+        title=&quot;&quot;
+        src=&quot;/static/popup-a6c66713b004436b5ee92bfae218fe0b-f8fb9.jpg&quot;
+        srcset=&quot;/static/popup-a6c66713b004436b5ee92bfae218fe0b-e8976.jpg 148w,
+/static/popup-a6c66713b004436b5ee92bfae218fe0b-63df2.jpg 295w,
+/static/popup-a6c66713b004436b5ee92bfae218fe0b-f8fb9.jpg 590w,
+/static/popup-a6c66713b004436b5ee92bfae218fe0b-85e3d.jpg 885w,
+/static/popup-a6c66713b004436b5ee92bfae218fe0b-0de24.jpg 928w&quot;
+        sizes=&quot;(max-width: 590px) 100vw, 590px&quot;
+      /&gt;
+    &lt;/span&gt;
+  &lt;/span&gt;
+  
+  &lt;/a&gt;
+    &lt;/p&gt;
+&lt;p&gt;The extension can insert any number of pre-defined card message parts, below you can see the Giphy extension insert an image card.&lt;/p&gt;
+&lt;p&gt;
+  &lt;a
+    class=&quot;gatsby-resp-image-link&quot;
+    href=&quot;/static/composing-c7fd938a1177e779b5eab47b1e87d16e-99062.jpg&quot;
+    style=&quot;display: block&quot;
+    target=&quot;_blank&quot;
+    rel=&quot;noopener&quot;
+  &gt;
+  
+  &lt;span
+    class=&quot;gatsby-resp-image-wrapper&quot;
+    style=&quot;position: relative; display: block; ; max-width: 590px; margin-left: auto; margin-right: auto;&quot;
+  &gt;
+    &lt;span
+      class=&quot;gatsby-resp-image-background-image&quot;
+      style=&quot;padding-bottom: 24.54642475987193%; position: relative; bottom: 0; left: 0; background-image: url(&apos;data:image/jpeg;base64,/9j/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wgARCAAFABQDASIAAhEBAxEB/8QAFwABAAMAAAAAAAAAAAAAAAAAAAECBf/EABQBAQAAAAAAAAAAAAAAAAAAAAD/2gAMAwEAAhADEAAAAdyQoD//xAAWEAEBAQAAAAAAAAAAAAAAAAAAATH/2gAIAQEAAQUCmK//xAAUEQEAAAAAAAAAAAAAAAAAAAAQ/9oACAEDAQE/AT//xAAUEQEAAAAAAAAAAAAAAAAAAAAQ/9oACAECAQE/AT//xAAUEAEAAAAAAAAAAAAAAAAAAAAQ/9oACAEBAAY/An//xAAYEAADAQEAAAAAAAAAAAAAAAAAESFRMf/aAAgBAQABPyHSkwV8P//aAAwDAQACAAMAAAAQcA//xAAUEQEAAAAAAAAAAAAAAAAAAAAQ/9oACAEDAQE/ED//xAAUEQEAAAAAAAAAAAAAAAAAAAAQ/9oACAECAQE/ED//xAAaEAEAAgMBAAAAAAAAAAAAAAABABEhQVFx/9oACAEBAAE/EDQMvWp4xAhpP//Z&apos;); background-size: cover; display: block;&quot;
+    &gt;
+      &lt;img
+        class=&quot;gatsby-resp-image-image&quot;
+        style=&quot;width: 100%; height: 100%; margin: 0; vertical-align: middle; position: absolute; top: 0; left: 0; box-shadow: inset 0px 0px 0px 400px white;&quot;
+        alt=&quot;Composing&quot;
+        title=&quot;&quot;
+        src=&quot;/static/composing-c7fd938a1177e779b5eab47b1e87d16e-f8fb9.jpg&quot;
+        srcset=&quot;/static/composing-c7fd938a1177e779b5eab47b1e87d16e-e8976.jpg 148w,
+/static/composing-c7fd938a1177e779b5eab47b1e87d16e-63df2.jpg 295w,
+/static/composing-c7fd938a1177e779b5eab47b1e87d16e-f8fb9.jpg 590w,
+/static/composing-c7fd938a1177e779b5eab47b1e87d16e-85e3d.jpg 885w,
+/static/composing-c7fd938a1177e779b5eab47b1e87d16e-99062.jpg 937w&quot;
+        sizes=&quot;(max-width: 590px) 100vw, 590px&quot;
+      /&gt;
+    &lt;/span&gt;
+  &lt;/span&gt;
+  
+  &lt;/a&gt;
+    &lt;/p&gt;
+&lt;p&gt;When the message is sent the MindLink client will then display the card in full detail:&lt;/p&gt;
+&lt;p&gt;
+  &lt;a
+    class=&quot;gatsby-resp-image-link&quot;
+    href=&quot;/static/inline-7cdee083e5832a3299a12c77916dbea4-4e39d.jpg&quot;
+    style=&quot;display: block&quot;
+    target=&quot;_blank&quot;
+    rel=&quot;noopener&quot;
+  &gt;
+  
+  &lt;span
+    class=&quot;gatsby-resp-image-wrapper&quot;
+    style=&quot;position: relative; display: block; ; max-width: 590px; margin-left: auto; margin-right: auto;&quot;
+  &gt;
+    &lt;span
+      class=&quot;gatsby-resp-image-background-image&quot;
+      style=&quot;padding-bottom: 67.95698924731182%; position: relative; bottom: 0; left: 0; background-image: url(&apos;data:image/jpeg;base64,/9j/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wgARCAAOABQDASIAAhEBAxEB/8QAGAAAAgMAAAAAAAAAAAAAAAAAAAQBAgX/xAAUAQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIQAxAAAAHYF2SC4f/EABkQAAMBAQEAAAAAAAAAAAAAAAACAwETEv/aAAgBAQABBQLmh4Q5oVkz1lmpPT//xAAUEQEAAAAAAAAAAAAAAAAAAAAQ/9oACAEDAQE/AT//xAAUEQEAAAAAAAAAAAAAAAAAAAAQ/9oACAECAQE/AT//xAAbEAACAwADAAAAAAAAAAAAAAABEQACMhASkf/aAAgBAQAGPwLA8mKzInYJJIwVsWRx/8QAGhAAAwEAAwAAAAAAAAAAAAAAAAERIUHR8f/aAAgBAQABPyGGC8gv1iY/nhk7W1jV4f/aAAwDAQACAAMAAAAQQM//xAAUEQEAAAAAAAAAAAAAAAAAAAAQ/9oACAEDAQE/ED//xAAUEQEAAAAAAAAAAAAAAAAAAAAQ/9oACAECAQE/ED//xAAdEAEAAwABBQAAAAAAAAAAAAABABEhMWFxgZHR/9oACAEBAAE/EMA9KY6njGs1djGpqEZtreHWYW0Hh35HsSFT/9k=&apos;); background-size: cover; display: block;&quot;
+    &gt;
+      &lt;img
+        class=&quot;gatsby-resp-image-image&quot;
+        style=&quot;width: 100%; height: 100%; margin: 0; vertical-align: middle; position: absolute; top: 0; left: 0; box-shadow: inset 0px 0px 0px 400px white;&quot;
+        alt=&quot;Inline conversation&quot;
+        title=&quot;&quot;
+        src=&quot;/static/inline-7cdee083e5832a3299a12c77916dbea4-f8fb9.jpg&quot;
+        srcset=&quot;/static/inline-7cdee083e5832a3299a12c77916dbea4-e8976.jpg 148w,
+/static/inline-7cdee083e5832a3299a12c77916dbea4-63df2.jpg 295w,
+/static/inline-7cdee083e5832a3299a12c77916dbea4-f8fb9.jpg 590w,
+/static/inline-7cdee083e5832a3299a12c77916dbea4-85e3d.jpg 885w,
+/static/inline-7cdee083e5832a3299a12c77916dbea4-4e39d.jpg 930w&quot;
+        sizes=&quot;(max-width: 590px) 100vw, 590px&quot;
+      /&gt;
+    &lt;/span&gt;
+  &lt;/span&gt;
+  
+  &lt;/a&gt;
+    &lt;/p&gt;
+&lt;p&gt;When the card is rendered in a Skype for Business client it shows the fallback text described by the extension. For Giphy integration that’s simply the link to the GIF, for other integrations that may be a combination of text and links.&lt;/p&gt;
+&lt;p&gt;
+  &lt;a
+    class=&quot;gatsby-resp-image-link&quot;
+    href=&quot;/static/sfb-06f330df972c5f0a7dcf7473dfde6534-1f48b.jpg&quot;
+    style=&quot;display: block&quot;
+    target=&quot;_blank&quot;
+    rel=&quot;noopener&quot;
+  &gt;
+  
+  &lt;span
+    class=&quot;gatsby-resp-image-wrapper&quot;
+    style=&quot;position: relative; display: block; ; max-width: 479px; margin-left: auto; margin-right: auto;&quot;
+  &gt;
+    &lt;span
+      class=&quot;gatsby-resp-image-background-image&quot;
+      style=&quot;padding-bottom: 119.6242171189979%; position: relative; bottom: 0; left: 0; background-image: url(&apos;data:image/jpeg;base64,/9j/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wgARCAAYABQDASIAAhEBAxEB/8QAGAABAQEBAQAAAAAAAAAAAAAAAAECAwX/xAAWAQEBAQAAAAAAAAAAAAAAAAABAgP/2gAMAwEAAhADEAAAAfXzuVn2E3YJQP8A/8QAGBAAAwEBAAAAAAAAAAAAAAAAAQIREBL/2gAIAQEAAQUCa2HGWnjQbn//xAAWEQEBAQAAAAAAAAAAAAAAAAAQESH/2gAIAQMBAT8BLp//xAAUEQEAAAAAAAAAAAAAAAAAAAAg/9oACAECAQE/AR//xAAXEAADAQAAAAAAAAAAAAAAAAAAITDh/9oACAEBAAY/AkbD/8QAHRABAAEDBQAAAAAAAAAAAAAAAQAQETEhgZHR8f/aAAgBAQABPyEruhd1hnhwscvFRwHcp//aAAwDAQACAAMAAAAQzPi+/8QAFhEBAQEAAAAAAAAAAAAAAAAAARAh/9oACAEDAQE/EE2KAT//xAAWEQEBAQAAAAAAAAAAAAAAAAABECH/2gAIAQIBAT8QIGLP/8QAGhABAAMBAQEAAAAAAAAAAAAAAQARMSFBYf/aAAgBAQABPxDqCFfEOVKRqVCWcqCBxhq4oC1MEUD0Ngj5P//Z&apos;); background-size: cover; display: block;&quot;
+    &gt;
+      &lt;img
+        class=&quot;gatsby-resp-image-image&quot;
+        style=&quot;width: 100%; height: 100%; margin: 0; vertical-align: middle; position: absolute; top: 0; left: 0; box-shadow: inset 0px 0px 0px 400px white;&quot;
+        alt=&quot;Skype for Business fallback&quot;
+        title=&quot;&quot;
+        src=&quot;/static/sfb-06f330df972c5f0a7dcf7473dfde6534-1f48b.jpg&quot;
+        srcset=&quot;/static/sfb-06f330df972c5f0a7dcf7473dfde6534-e4839.jpg 148w,
+/static/sfb-06f330df972c5f0a7dcf7473dfde6534-9f8fc.jpg 295w,
+/static/sfb-06f330df972c5f0a7dcf7473dfde6534-1f48b.jpg 479w&quot;
+        sizes=&quot;(max-width: 479px) 100vw, 479px&quot;
+      /&gt;
+    &lt;/span&gt;
+  &lt;/span&gt;
+  
+  &lt;/a&gt;
+    &lt;/p&gt;
+&lt;p&gt;We are very excited to be developing this new set of features for our customers, enabling next generation functionality without requiring a whole new platform!&lt;/p&gt;</content:encoded></item><item><title><![CDATA[Why DraftJS doesn't work on Android]]></title><description><![CDATA[DraftJS  is a popular open source rich text editing library for React maintained by Facebook. It allows developers to decorate input text as…]]></description><link>https://engineering.mindlinksoft.comwhy-draftjs-doesnt-work-on-android</link><guid isPermaLink="false">https://engineering.mindlinksoft.comwhy-draftjs-doesnt-work-on-android</guid><pubDate>Sun, 22 Apr 2018 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;&lt;a href=&quot;https://draftjs.org/&quot;&gt;DraftJS&lt;/a&gt; is a popular open source rich text editing library for React maintained by Facebook. It allows developers to decorate input text as the user types, and provides a way to embed metadata into the decorated text (e.g. a URL.) Also supports commands, keyboard shortcuts …&lt;/p&gt;
 &lt;p&gt;All of these rich development features come with a caveat however: mobile browsers are not officially supported. This means that if you’re developing your mobile applications as wrapped web applications via &lt;a href=&quot;https://cordova.apache.org/&quot;&gt;Cordova&lt;/a&gt; (or &lt;a href=&quot;https://phonegap.com/&quot;&gt;Phonegap&lt;/a&gt;, or &lt;a href=&quot;https://ionicframework.com/&quot;&gt;Ionic&lt;/a&gt;) then you’re probably out of luck.&lt;/p&gt;
 &lt;p&gt;This post is about &lt;em&gt;why&lt;/em&gt; the way Draft works is in principle incompatible with the Google virtual keyboard which is the default on certain Android devices. Supporting multiple mobile operating systems with the same code-base is one of the main reasons why to use Cordova (or similar) in the first place, so you are likely to want to use the same rich text editing library across them all&lt;sup id=&quot;fnref-1&quot;&gt;&lt;a href=&quot;#fn-1&quot; class=&quot;footnote-ref&quot;&gt;1&lt;/a&gt;&lt;/sup&gt;.&lt;/p&gt;
 &lt;h2&gt;An eventful experience&lt;/h2&gt;
