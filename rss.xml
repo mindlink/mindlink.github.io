@@ -1,29 +1,29 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Engineering at MindLink]]></title><description><![CDATA[Insights and musings from the MindLink software engineers]]></description><link>https://engineering.mindlinksoft.com</link><generator>RSS for Node</generator><lastBuildDate>Wed, 20 Jun 2018 17:29:51 GMT</lastBuildDate><item><title><![CDATA[End-To-End Encryption with the Signal Protocol]]></title><description><![CDATA[What is the Signal Protocol? The Signal Protocol (formerly TextSecure Protocol) defines a cryptographic encryption protocol for secure end…]]></description><link>https://engineering.mindlinksoft.comend-to-end-encryption-with-the-signal-protocol</link><guid isPermaLink="false">https://engineering.mindlinksoft.comend-to-end-encryption-with-the-signal-protocol</guid><pubDate>Wed, 20 Jun 2018 10:15:00 GMT</pubDate><content:encoded>&lt;h2&gt;What is the Signal Protocol?&lt;/h2&gt;
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Engineering at MindLink]]></title><description><![CDATA[Insights and musings from the MindLink software engineers]]></description><link>https://engineering.mindlinksoft.com</link><generator>RSS for Node</generator><lastBuildDate>Wed, 20 Jun 2018 17:33:20 GMT</lastBuildDate><item><title><![CDATA[End-To-End Encryption with the Signal Protocol]]></title><description><![CDATA[What is the Signal Protocol? The Signal Protocol (formerly TextSecure Protocol) defines a cryptographic encryption protocol for secure end…]]></description><link>https://engineering.mindlinksoft.comend-to-end-encryption-with-the-signal-protocol</link><guid isPermaLink="false">https://engineering.mindlinksoft.comend-to-end-encryption-with-the-signal-protocol</guid><pubDate>Wed, 20 Jun 2018 10:15:00 GMT</pubDate><content:encoded>&lt;h2&gt;What is the Signal Protocol?&lt;/h2&gt;
 &lt;p&gt;The Signal Protocol (formerly TextSecure Protocol) defines a cryptographic encryption protocol for secure end-to-end encryption (E2EE). It was created by Open Whisper Systems for use in their secure messaging app TextSecure but has since been released, open-source, to the wider community. It has become hugely popular amongst consumer applications and has earned its name as the defacto standard for securing messaging and voice and video communications. Some of the largest adopters include Google Allo, Facebook Messenger and WhatsApp, but more and more organizations are embracing E2EE everyday as concerns surrounding privacy, security and surveillance increasingly find themselves center-stage in the public eye.&lt;/p&gt;
 &lt;p&gt;In simple terms, E2EE allows us to ensure our data is only visibile to its intended recipient; the data is encrypted on the client on the user’s own device before it is even sent over the wire. This means that all the infrastructure in the middle (routing, messaging servers, databases etc.) will never get to see your data in its raw form! And this is great — it means we can completely eliminate the element of trust between client and server so users no longer have to worry about whether their data is truly safe in the hands of their messaging provider. More importantly though, it means that any third party trying to intercept a user’s communications in transit will surely fail!&lt;/p&gt;
 &lt;h2&gt;Give me an example.&lt;/h2&gt;
 &lt;p&gt;As an example let’s say that user A wants to send a message to user B over MindLink — here is how a typical Signal Protocol exchange goes:&lt;/p&gt;
 &lt;div class=&quot;gatsby-highlight&quot;&gt;
-      &lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;1. User A and User B log on for the first time and generate new asymmetrics key-pairs. They publish their public keys to a server.
-2. User A downloads user B&amp;#39;s keys from the server.
-3. He creates a new secure messaging session.
-4. Then encrypts the message.
-5. Sends the message over MindLink.
-6. User B receives the messages and starts a matching secure messaging session, decrypting the message.&lt;/code&gt;&lt;/pre&gt;
+      &lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;1) User A and User B log on for the first time and generate new asymmetrics key-pairs. They publish their public keys to a server.
+2) User A downloads user B&amp;#39;s keys from the server.
+3) He creates a new secure messaging session.
+4) Then encrypts the message.
+5) Sends the message over MindLink.
+6) User B receives the messages and starts a matching secure messaging session, decrypting the message.&lt;/code&gt;&lt;/pre&gt;
       &lt;/div&gt;
 &lt;h2&gt;Ok, now let’s unpack this a little…&lt;/h2&gt;
 &lt;div class=&quot;gatsby-highlight&quot;&gt;
-      &lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;1. When logging in to MindLink for the first time, each user generates serveral sets of keys: A long-term identity key-pair, a medium-term signed prekey pair and several emphemeral keys. The public keys of these pairs are packaged up into whats known as a prekey bundle. This bundle is then sent to a Key Exchange server for storage and dissemintation.
+      &lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;**1)** When logging in to MindLink for the first time, each user generates serveral sets of keys: A long-term identity key-pair, a medium-term signed prekey pair and several emphemeral keys. The public keys of these pairs are packaged up into whats known as a prekey bundle. This bundle is then sent to a Key Exchange server for storage and dissemintation.
 
-2. User A decides to send a message to user B for the first time. User A starts by requesting user B&amp;#39;s prekey bundle from the Key Exchange.
+**2)** User A decides to send a message to user B for the first time. User A starts by requesting user B&amp;#39;s prekey bundle from the Key Exchange.
 
-3. With this, user A builds a new session based on both their keys and user B&amp;#39;s keys in what is referred to as the **Extended Triple Diffie-Hellman (X3DH) key agreement protocol**. 
+**3)** With this, user A builds a new session based on both their keys and user B&amp;#39;s keys in what is referred to as the **Extended Triple Diffie-Hellman (X3DH) key agreement protocol**. 
 
 Note: This sounds like a mouthful, and while I likely won&amp;#39;t do it justice here you can find very detailed information about X3DH and indeed the other defining features of the Signal Protocol at the official website, [https://signal.org/docs/](https://signal.org/docs/).
 
 The Diffie-Hellman (or more specifically the **elliptic-curve Diffie-Hellman**) protocol describes a novel way of deriving a shared secret amongst two parties over an insecure channel. Using some clever mathematics it can be shown that two users sharing some initial public data and some hidden secret data can exchange a sequence of transformations based on that data and arrive at entirely the same conclusion - the shared secret - without anyone who might be observing this exchange being able to do the same! This shared secret then becomes the starting point of an encrypted session between the two users.
 
-4. User A encypts a message using their new session.
+**4)** User A encypts a message using their new session.
 
 This relies on Signal Protocol&amp;#39;s famous [Double Ratchet algorithm](https://signal.org/docs/specifications/doubleratchet/) which combines two types of ratchet - a symmetric-key ratchet and a Diffie-Hellman ratchet - to acheive a means of deriving a series of unique message encryption keys that are totally dissociated from any previous or future encryption keys. This means that if an attacker were to compromise one the Double Ratchet keys, they could not then go on to decrypt any other messages. It is this feature of dynamically evolving cryptography that affords Signal its uber-secure reputation.
 
@@ -35,9 +35,9 @@ This all sounds quite complicated... and that&amp;#39;s because it is! I would e
 
 The message itself contains the encrypted ciphertext payload along with the outputs of the DH ratchet at each stage and some additional information for the recipient to advance their receiving key chain correctly. But this is also a special case - being the first message sent in a new session. User A also straps their prekey bundle to the encrypted message so user B can derive a complementary session.
 
-5. User A sends the encrypted payload over the wire!
+**5)** User A sends the encrypted payload over the wire!
 
-6. User B receives the encrypted message payload. They recognise that they don&amp;#39;t have a matching session for the message, but they DO realise that there&amp;#39;s a prekey bundle attached to the message that they can establish one with. After going through the same steps as user A in #3 and #4 user B ends up with the decrypted plaintext message.&lt;/code&gt;&lt;/pre&gt;
+**6)** User B receives the encrypted message payload. They recognise that they don&amp;#39;t have a matching session for the message, but they DO realise that there&amp;#39;s a prekey bundle attached to the message that they can establish one with. After going through the same steps as user A in #3 and #4 user B ends up with the decrypted plaintext message.&lt;/code&gt;&lt;/pre&gt;
       &lt;/div&gt;
 &lt;h2&gt;Wrapping it up&lt;/h2&gt;
 &lt;p&gt;So that’s it! There are plenty of details left out here but this should hopefully offers a decent high-level overview of the kind of flow and processes you can expect to see in a typicaly Signal Protocol offering.&lt;/p&gt;
