@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Engineering at MindLink]]></title><description><![CDATA[Insights and musings from the MindLink software engineers]]></description><link>https://engineering.mindlinksoft.com</link><generator>RSS for Node</generator><lastBuildDate>Thu, 21 Jun 2018 11:40:15 GMT</lastBuildDate><item><title><![CDATA[End-To-End Encryption with the Signal Protocol]]></title><description><![CDATA[What is the Signal Protocol? The Signal Protocol (formerly TextSecure Protocol) defines a cryptographic encryption protocol for secure end…]]></description><link>https://engineering.mindlinksoft.comend-to-end-encryption-with-the-signal-protocol</link><guid isPermaLink="false">https://engineering.mindlinksoft.comend-to-end-encryption-with-the-signal-protocol</guid><pubDate>Wed, 20 Jun 2018 10:15:00 GMT</pubDate><content:encoded>&lt;h2&gt;What is the Signal Protocol?&lt;/h2&gt;
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Engineering at MindLink]]></title><description><![CDATA[Insights and musings from the MindLink software engineers]]></description><link>https://engineering.mindlinksoft.com</link><generator>RSS for Node</generator><lastBuildDate>Thu, 21 Jun 2018 11:41:29 GMT</lastBuildDate><item><title><![CDATA[End-To-End Encryption with the Signal Protocol]]></title><description><![CDATA[What is the Signal Protocol? The Signal Protocol (formerly TextSecure Protocol) defines a cryptographic encryption protocol for secure end…]]></description><link>https://engineering.mindlinksoft.comend-to-end-encryption-with-the-signal-protocol</link><guid isPermaLink="false">https://engineering.mindlinksoft.comend-to-end-encryption-with-the-signal-protocol</guid><pubDate>Wed, 20 Jun 2018 10:15:00 GMT</pubDate><content:encoded>&lt;h2&gt;What is the Signal Protocol?&lt;/h2&gt;
 &lt;p&gt;The Signal Protocol (formerly TextSecure Protocol) defines a cryptographic encryption protocol for secure end-to-end encryption (E2EE). It was created by Open Whisper Systems for use in their secure messaging app TextSecure but has since been released, open-source, to the wider community. It has become hugely popular amongst consumer applications and has earned its name as the de facto standard for securing messaging and voice and video communications. Some of the largest adopters include Google Allo, Facebook Messenger and WhatsApp, but more and more organizations are embracing E2EE everyday as concerns surrounding privacy, security and surveillance increasingly find themselves centre-stage in the public eye.&lt;/p&gt;
 &lt;p&gt;In simple terms, E2EE allows us to ensure our data is only visibile to its intended recipient; the data is encrypted on the client on the user’s own device before it is even sent over the wire. This means that all the infrastructure in the middle (routing, messaging servers, databases etc.) will never get to see your data in its raw form! And this is great — it means we can completely eliminate the element of trust between client and server so users no longer have to worry about whether their data is truly safe in the hands of their messaging provider. More importantly though, it means that any third party trying to intercept a user’s communications in transit will surely fail!&lt;/p&gt;
 &lt;h2&gt;Give me an example.&lt;/h2&gt;
@@ -420,7 +420,296 @@ eth&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=
   
   &lt;/a&gt;
     &lt;/p&gt;
-&lt;p&gt;We are very excited to be developing this new set of features for our customers, enabling next generation functionality without requiring a whole new platform!&lt;/p&gt;</content:encoded></item><item><title><![CDATA[Why DraftJS doesn't work on Android]]></title><description><![CDATA[DraftJS  is a popular open source rich text editing library for React maintained by Facebook. It allows developers to decorate input text as…]]></description><link>https://engineering.mindlinksoft.comwhy-draftjs-doesnt-work-on-android</link><guid isPermaLink="false">https://engineering.mindlinksoft.comwhy-draftjs-doesnt-work-on-android</guid><pubDate>Sun, 22 Apr 2018 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;&lt;a href=&quot;https://draftjs.org/&quot;&gt;DraftJS&lt;/a&gt; is a popular open source rich text editing library for React maintained by Facebook. It allows developers to decorate input text as the user types, and provides a way to embed metadata into the decorated text (e.g. a URL.) Also supports commands, keyboard shortcuts …&lt;/p&gt;
+&lt;p&gt;We are very excited to be developing this new set of features for our customers, enabling next generation functionality without requiring a whole new platform!&lt;/p&gt;</content:encoded></item><item><title><![CDATA[Leveraging Rasa to build on-premise intelligent chat bots]]></title><description><![CDATA[In this post we will explain and demonstrate how to leverage  Rasa  to develop intelligent chatbots and securely deploy them on premise…]]></description><link>https://engineering.mindlinksoft.comleveraging-rasa-to-build-on-premise-intelligent-chat-bots</link><guid isPermaLink="false">https://engineering.mindlinksoft.comleveraging-rasa-to-build-on-premise-intelligent-chat-bots</guid><pubDate>Fri, 18 May 2018 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;In this post we will explain and demonstrate how to leverage &lt;a href=&quot;https://rasa.com/&quot;&gt;Rasa&lt;/a&gt; to develop intelligent chatbots and securely deploy them on premise. Chatbots are one of the most direct ways to integrate with existing chat platforms. Whether you require a simple bot that replies to specific queries by fetching some information, or a more complex NPL-powered interactive agent, chatbots provide a way to integrate external services and functions into the collaboration experience of the chat platform users.&lt;/p&gt;
+&lt;h2&gt;Chatbot development since 2016&lt;/h2&gt;
+&lt;p&gt;Modern chatbot development for the most part leverages the capabilities of cloud APIs such as Microsoft &lt;a href=&quot;https://azure.microsoft.com/en-gb/services/cognitive-services/language-understanding-intelligent-service/&quot;&gt;LUIS&lt;/a&gt; and Google &lt;a href=&quot;https://dialogflow.com/&quot;&gt;DialogFlow&lt;/a&gt; that tend to abstract away from the developer most of the underlying complexities of natural language understanding and response selection tasks. This makes developing chatbot integration significantly easier than it would have been previously, where either more rudimentary approaches where necessary or intelligent chatbot development was significantly harder. This unfortunately means that this useful level of abstraction is unavailable to enterprise environments that have strict compliance or security requirements.&lt;/p&gt;
+&lt;p&gt;The use of cloud APIs that can read and store the information exchanged can lead to sensitive information being leaked to unintended parties, as well as not being as easlily traceable and archivable for compliance purposes. This means that many existing chatbot integrations that use these APIs are unsuitable for use on premise, and in-house development teams are prevented from using them as well. In order to achieve the same rich user experience talking to intelligent chatbots the in-house team has a lot more work to do, which may make these integrations unreasonably complex and time consuming to develop.&lt;/p&gt;
+&lt;h2&gt;Enter Rasa&lt;/h2&gt;
+&lt;p&gt;Rasa is the only natural language understanding and chatbot development API that is open source. The API itself can be deployed on premise in a controlled environment, with each message becoming easily traceable and subject to the same security constrains as any other message exchanged over the chat system. By using Rasa it becomes relatively easy to analise natural language messages sent by chat users for intent categorisation and to build intelligent integrations with external systems.&lt;/p&gt;
+&lt;p&gt;We’re now going to take a look at a very simple bot built through Rasa and how to connect it to the MindLink API.&lt;/p&gt;
+&lt;h2&gt;The interesting bit&lt;/h2&gt;
+&lt;p&gt;For this example we’re going to use one of the tutorials for Rasa Core, and implement a simple group-listening bot connection to MindLink that will read all messages sent in a particular chatroom and reply with some information. It should be possible to resuse the connection code for other bots in the same manner as it is used here. We’ll implement the whole thing in Python as that is the simplest way to write bots against Rasa, but mutatis mutandis you should be able to re-implment the connection in your faviorite language. Similarly to how the MindLink API works, you can setup the Rasa API as a REST service and use any language.&lt;/p&gt;
+&lt;p&gt;I’m going to assume you have Rasa Core installed locally, and you have your local Python environment setup (I’m assuming Python3, but the connection code is relatively straightforward and should not be too hard to port to Python2).&lt;/p&gt;
+&lt;h3&gt;The anathomy of an intelligent chat bot&lt;/h3&gt;
+&lt;p&gt;There are two independent pieces of a Rasa bot: an “interpreter” or intent-extractor and a dialogue model. The first is a mechanism to “parse” natural language input and extract the user intent, then feed this to the dialogue model together with raw natural language input. It is trained over a set of pre-classified data, and uses this training to classify new inputs. Similarly, the dialogue model is built from a set of response templates, actions and the same intents recognized by the interpreter. It is also trained over sample dialogues that represent possible conversations.&lt;/p&gt;
+&lt;p&gt;Both modular pieces are implemented in a “data-driven” fashion: to develop an intelligent chatbot a significant amount of training data is required for both the intent extractor and the dialogue model. Interactive training modes, where you basically have a dialogue with the interpreter/dialogue model and give it feedback allowing it to adjust its responses, are available out of the box. Both components are also independent from each other (you can use alternative dialogue models/intent extractor with them) and allow very fine tuning of the resulting trained models (if you know what you’re doing). Again, compelling chatbots are always the product of repeated training over a significant body of data. Depending on the application, there may be large data sets already publically available (e.g. healthcare etc).&lt;/p&gt;
+&lt;h3&gt;Great, but how do I actually put these together?&lt;/h3&gt;
+&lt;p&gt;Let’s focus on the intent extractor first. We’ll define a set of intents in a markdown file with some initial associated data: &lt;code class=&quot;language-text&quot;&gt;intents.md&lt;/code&gt;. This is the file that basically defines how the intent extractor is going to interpret the input&lt;sup id=&quot;fnref-1&quot;&gt;&lt;a href=&quot;#fn-1&quot; class=&quot;footnote-ref&quot;&gt;1&lt;/a&gt;&lt;/sup&gt;.&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot;&gt;
+      &lt;pre class=&quot;language-markdown&quot;&gt;&lt;code class=&quot;language-markdown&quot;&gt;&lt;span class=&quot;token title important&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;##&lt;/span&gt; intent:greet&lt;/span&gt;
+&lt;span class=&quot;token list punctuation&quot;&gt;-&lt;/span&gt; hey
+&lt;span class=&quot;token list punctuation&quot;&gt;-&lt;/span&gt; hello
+&lt;span class=&quot;token list punctuation&quot;&gt;-&lt;/span&gt; hi
+
+&lt;span class=&quot;token title important&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;##&lt;/span&gt; intent:goodbye&lt;/span&gt;
+&lt;span class=&quot;token list punctuation&quot;&gt;-&lt;/span&gt; bye
+&lt;span class=&quot;token list punctuation&quot;&gt;-&lt;/span&gt; goodbye
+
+&lt;span class=&quot;token title important&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;##&lt;/span&gt; intent:mood_affirm&lt;/span&gt;
+&lt;span class=&quot;token list punctuation&quot;&gt;-&lt;/span&gt; yes
+&lt;span class=&quot;token list punctuation&quot;&gt;-&lt;/span&gt; correct
+
+&lt;span class=&quot;token title important&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;##&lt;/span&gt; intent:mood_deny&lt;/span&gt;
+&lt;span class=&quot;token list punctuation&quot;&gt;-&lt;/span&gt; no
+&lt;span class=&quot;token list punctuation&quot;&gt;-&lt;/span&gt; nope
+
+&lt;span class=&quot;token title important&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;##&lt;/span&gt; intent:mood_great&lt;/span&gt;
+&lt;span class=&quot;token list punctuation&quot;&gt;-&lt;/span&gt; very good
+&lt;span class=&quot;token list punctuation&quot;&gt;-&lt;/span&gt; great
+&lt;span class=&quot;token list punctuation&quot;&gt;-&lt;/span&gt; amazing
+&lt;span class=&quot;token list punctuation&quot;&gt;-&lt;/span&gt; happy
+
+&lt;span class=&quot;token title important&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;##&lt;/span&gt; intent:mood_unhappy&lt;/span&gt;
+&lt;span class=&quot;token list punctuation&quot;&gt;-&lt;/span&gt; I am sad
+&lt;span class=&quot;token list punctuation&quot;&gt;-&lt;/span&gt; super sad
+&lt;span class=&quot;token list punctuation&quot;&gt;-&lt;/span&gt; sad
+&lt;span class=&quot;token list punctuation&quot;&gt;-&lt;/span&gt; very sad
+&lt;span class=&quot;token list punctuation&quot;&gt;-&lt;/span&gt; unhappy
+&lt;span class=&quot;token list punctuation&quot;&gt;-&lt;/span&gt; so saad
+&lt;span class=&quot;token list punctuation&quot;&gt;-&lt;/span&gt; so sad&lt;/code&gt;&lt;/pre&gt;
+      &lt;/div&gt;
+&lt;p&gt;Secondly, we’ll need two separate files for the dialogue model, one to define the things it recognizes and the actions it can take, and another with example conversations that exemplify when to take an action. First we define a domain: &lt;code class=&quot;language-text&quot;&gt;domain.yml&lt;/code&gt;.&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot;&gt;
+      &lt;pre class=&quot;language-yml&quot;&gt;&lt;code class=&quot;language-yml&quot;&gt;intents:
+  - greet
+  - goodbye
+  - mood_affirm
+  - mood_deny
+  - mood_great
+  - mood_unhappy
+
+actions:
+- utter_greet
+- utter_cheer_up
+- utter_did_that_help
+- utter_happy
+- utter_goodbye
+
+templates:
+  utter_greet:
+  - text: &amp;quot;Hey! How are you?&amp;quot;
+    buttons:
+    - title: &amp;quot;great&amp;quot;
+      payload: &amp;quot;great&amp;quot;
+    - title: &amp;quot;super sad&amp;quot;
+      payload: &amp;quot;super sad&amp;quot;
+
+  utter_cheer_up:
+  - text: &amp;quot;Here is something to cheer you up:&amp;quot;
+    image: &amp;quot;https://i.imgur.com/nGF1K8f.jpg&amp;quot;
+
+  utter_did_that_help:
+  - text: &amp;quot;Did that help you?&amp;quot;
+  - text: &amp;quot;Was that helpful?&amp;quot;
+
+  utter_happy:
+  - text: &amp;quot;Great carry on!&amp;quot;
+
+  utter_goodbye:
+  - text: &amp;quot;Bye&amp;quot;&lt;/code&gt;&lt;/pre&gt;
+      &lt;/div&gt;
+&lt;p&gt;As you can see the domain also contains the response templates the bot can respond with.
+Then we define sample conversations &lt;code class=&quot;language-text&quot;&gt;stories.md&lt;/code&gt;:&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot;&gt;
+      &lt;pre class=&quot;language-markdown&quot;&gt;&lt;code class=&quot;language-markdown&quot;&gt;&lt;span class=&quot;token title important&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;##&lt;/span&gt; happy path               &lt;/span&gt;&lt;span class=&quot;token comment&quot;&gt;&amp;lt;!-- name of the story - just for debugging --&gt;&lt;/span&gt;
+&lt;span class=&quot;token list punctuation&quot;&gt;*&lt;/span&gt; greet
+  &lt;span class=&quot;token list punctuation&quot;&gt;-&lt;/span&gt; utter_greet
+&lt;span class=&quot;token list punctuation&quot;&gt;*&lt;/span&gt; mood_great               &lt;span class=&quot;token comment&quot;&gt;&amp;lt;!-- user utterance, in format _intent[entities] --&gt;&lt;/span&gt;
+  &lt;span class=&quot;token list punctuation&quot;&gt;-&lt;/span&gt; utter_happy
+
+&lt;span class=&quot;token title important&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;##&lt;/span&gt; sad path 1               &lt;/span&gt;&lt;span class=&quot;token comment&quot;&gt;&amp;lt;!-- this is already the start of the next story --&gt;&lt;/span&gt;
+&lt;span class=&quot;token list punctuation&quot;&gt;*&lt;/span&gt; greet
+  &lt;span class=&quot;token list punctuation&quot;&gt;-&lt;/span&gt; utter_greet             &lt;span class=&quot;token comment&quot;&gt;&amp;lt;!-- action of the bot to execute --&gt;&lt;/span&gt;
+&lt;span class=&quot;token list punctuation&quot;&gt;*&lt;/span&gt; mood_unhappy
+  &lt;span class=&quot;token list punctuation&quot;&gt;-&lt;/span&gt; utter&lt;span class=&quot;token italic&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;_&lt;/span&gt;cheer&lt;span class=&quot;token punctuation&quot;&gt;_&lt;/span&gt;&lt;/span&gt;up
+  &lt;span class=&quot;token list punctuation&quot;&gt;-&lt;/span&gt; utter&lt;span class=&quot;token italic&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;_&lt;/span&gt;did&lt;span class=&quot;token punctuation&quot;&gt;_&lt;/span&gt;&lt;/span&gt;that_help
+&lt;span class=&quot;token list punctuation&quot;&gt;*&lt;/span&gt; mood_affirm
+  &lt;span class=&quot;token list punctuation&quot;&gt;-&lt;/span&gt; utter_happy
+
+&lt;span class=&quot;token title important&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;##&lt;/span&gt; sad path 2&lt;/span&gt;
+&lt;span class=&quot;token list punctuation&quot;&gt;*&lt;/span&gt; greet
+  &lt;span class=&quot;token list punctuation&quot;&gt;-&lt;/span&gt; utter_greet
+&lt;span class=&quot;token list punctuation&quot;&gt;*&lt;/span&gt; mood_unhappy
+  &lt;span class=&quot;token list punctuation&quot;&gt;-&lt;/span&gt; utter&lt;span class=&quot;token italic&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;_&lt;/span&gt;cheer&lt;span class=&quot;token punctuation&quot;&gt;_&lt;/span&gt;&lt;/span&gt;up
+  &lt;span class=&quot;token list punctuation&quot;&gt;-&lt;/span&gt; utter&lt;span class=&quot;token italic&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;_&lt;/span&gt;did&lt;span class=&quot;token punctuation&quot;&gt;_&lt;/span&gt;&lt;/span&gt;that_help
+&lt;span class=&quot;token list punctuation&quot;&gt;*&lt;/span&gt; mood_deny
+  &lt;span class=&quot;token list punctuation&quot;&gt;-&lt;/span&gt; utter_goodbye
+
+&lt;span class=&quot;token title important&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;##&lt;/span&gt; say goodbye&lt;/span&gt;
+&lt;span class=&quot;token list punctuation&quot;&gt;*&lt;/span&gt; goodbye
+  &lt;span class=&quot;token list punctuation&quot;&gt;-&lt;/span&gt; utter_goodbye
+
+&lt;span class=&quot;token title important&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;##&lt;/span&gt; no greeting happy&lt;/span&gt;
+&lt;span class=&quot;token list punctuation&quot;&gt;*&lt;/span&gt; mood_great
+  &lt;span class=&quot;token list punctuation&quot;&gt;-&lt;/span&gt; utter_happy
+
+&lt;span class=&quot;token title important&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;##&lt;/span&gt; no greeting sad&lt;/span&gt;
+&lt;span class=&quot;token list punctuation&quot;&gt;*&lt;/span&gt; mood_unhappy
+  &lt;span class=&quot;token list punctuation&quot;&gt;-&lt;/span&gt; utter&lt;span class=&quot;token italic&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;_&lt;/span&gt;cheer&lt;span class=&quot;token punctuation&quot;&gt;_&lt;/span&gt;&lt;/span&gt;up
+  &lt;span class=&quot;token list punctuation&quot;&gt;-&lt;/span&gt; utter&lt;span class=&quot;token italic&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;_&lt;/span&gt;did&lt;span class=&quot;token punctuation&quot;&gt;_&lt;/span&gt;&lt;/span&gt;that_help&lt;/code&gt;&lt;/pre&gt;
+      &lt;/div&gt;
+&lt;p&gt;Each story is an independent example of a complete conversation. As you can see, the dialogue model doesn’t understand natural language, it undertstands intents. So the raw input needs to be piped through the intent extractor and then into the dialogue model.&lt;/p&gt;
+&lt;p&gt;Now that we’ve defined our data in files we need to train (“compile” if you like) the actual models from the data. You can use config files or pass additional parameters to the python scripts:&lt;/p&gt;
+&lt;p&gt;nlu_config.json&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot;&gt;
+      &lt;pre class=&quot;language-json&quot;&gt;&lt;code class=&quot;language-json&quot;&gt;&lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;token property&quot;&gt;&quot;pipeline&quot;&lt;/span&gt;&lt;span class=&quot;token operator&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;spacy_sklearn&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+  &lt;span class=&quot;token property&quot;&gt;&quot;path&quot;&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;./models/interpreter&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+  &lt;span class=&quot;token property&quot;&gt;&quot;data&quot;&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;./data/intents.md&quot;&lt;/span&gt;
+&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+      &lt;/div&gt;
+&lt;p&gt;Training the intent extractor:&lt;/p&gt;
+&lt;p&gt;&lt;code class=&quot;language-text&quot;&gt;python -m rasa_nlu.train -c nlu_config.json --fixed_model_name current&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Training the dialogue model:&lt;/p&gt;
+&lt;p&gt;&lt;code class=&quot;language-text&quot;&gt;python -m rasa_core.train -s data/stories.md -d domain.yml -o models/dialogue --epochs 300&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Hopefully, you’ve got a working bot at this point. You can talk to it over the command line&lt;sup id=&quot;fnref-2&quot;&gt;&lt;a href=&quot;#fn-2&quot; class=&quot;footnote-ref&quot;&gt;2&lt;/a&gt;&lt;/sup&gt;:&lt;/p&gt;
+&lt;p&gt;&lt;code class=&quot;language-text&quot;&gt;python -m rasa_core.run -d models/dialogue -u models/interpeter/default/current&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Now we are ready to wire this up to the MindLink API.&lt;/p&gt;
+&lt;h3&gt;A simple Python MindLink API connection&lt;/h3&gt;
+&lt;p&gt;We’re going to define a simple API connection class. This class will be responsible for interfacing with MindLink, relaying messages received to a consumer (which will be the bot in our example) and allowing for sending messages.&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot;&gt;
+      &lt;pre class=&quot;language-python&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;&lt;span class=&quot;token keyword&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;token class-name&quot;&gt;ApiConnection&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;authenticate&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        requestUrl &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&apos;{}/Authentication/V1/Tokens&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token builtin&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;host&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+
+        response &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; requests&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;post&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;
+            requestUrl&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+            json &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;token string&quot;&gt;&apos;Username&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;username&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+                &lt;span class=&quot;token string&quot;&gt;&apos;Password&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;password&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+                &lt;span class=&quot;token string&quot;&gt;&apos;AgentId&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;agent
+            &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+            headers &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;RequestHeaders&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+
+        self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;token &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; response&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;json&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+
+        &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;token
+
+    &lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;getMessages&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; channelId&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; count&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        requestUrl &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&apos;{}/Collaboration/V1/Channels/{}/Messages&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token builtin&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;host&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; channelId&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+
+        parameters &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;token string&quot;&gt;&apos;take&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; count&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+
+        response &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; requests&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;get&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;
+            requestUrl&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+            params &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; parameters&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+            headers &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;token string&quot;&gt;&apos;Accept&apos;&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&apos;application/json&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+                &lt;span class=&quot;token string&quot;&gt;&apos;Authorization&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&apos;FCF {}&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token builtin&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;token&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+            &lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+
+        &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; response&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;json&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+
+    &lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;sendMessage&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; channelId&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; message&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        requestUrl &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&apos;{}/Collaboration/V1/Channels/{}/Messages&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token builtin&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;host&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; channelId&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+
+        response &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; requests&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;post&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;
+            requestUrl&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+            json &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;token string&quot;&gt;&apos;Text&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; json&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;dumps&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;message&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+                &lt;span class=&quot;token string&quot;&gt;&apos;IsAlert&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token boolean&quot;&gt;False&lt;/span&gt;
+            &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+            headers &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;token string&quot;&gt;&apos;Accept&apos;&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&apos;application/json&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+                &lt;span class=&quot;token string&quot;&gt;&apos;Authorization&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&apos;FCF {}&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token builtin&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;token&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+            &lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+
+        &lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; response&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;status_code &lt;span class=&quot;token operator&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;200&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;token keyword&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&apos;Failed to send message to channel&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; channelId&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+
+    &lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;_getEvents&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; channelId&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; callback&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;running &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token boolean&quot;&gt;True&lt;/span&gt;
+
+        &lt;span class=&quot;token keyword&quot;&gt;while&lt;/span&gt; self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;running&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+            requestUrl &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&apos;{}/Collaboration/V1/Events&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token builtin&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;host&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+
+            parameters &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;token string&quot;&gt;&apos;last-event&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;last_event&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+                &lt;span class=&quot;token string&quot;&gt;&apos;types&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&apos;message&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+                &lt;span class=&quot;token string&quot;&gt;&apos;channels&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;channelId&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+                &lt;span class=&quot;token string&quot;&gt;&apos;regex&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&apos;&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+                &lt;span class=&quot;token string&quot;&gt;&apos;origins&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&apos;remote&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;
+            &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+
+            response &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; requests&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;get&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;
+                requestUrl&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+                params &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; parameters&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+                headers &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+                    &lt;span class=&quot;token string&quot;&gt;&apos;Accept&apos;&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&apos;application/json&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+                    &lt;span class=&quot;token string&quot;&gt;&apos;Authorization&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&apos;FCF {}&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token builtin&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;token&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+                    &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+
+            &lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; response&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;status_code &lt;span class=&quot;token operator&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;200&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+                &lt;span class=&quot;token keyword&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&apos;Failed to get new messages from channel&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; channelId&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+                &lt;span class=&quot;token keyword&quot;&gt;continue&lt;/span&gt;
+
+            &lt;span class=&quot;token keyword&quot;&gt;for&lt;/span&gt; event &lt;span class=&quot;token keyword&quot;&gt;in&lt;/span&gt; response&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;json&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+                eventId &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; event&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&apos;EventId&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;
+                &lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;eventId &lt;span class=&quot;token operator&quot;&gt;&gt;&lt;/span&gt; self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;last_event&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+                    self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;last_event &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; eventId
+
+                &lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;event&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&apos;Sender&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;!=&lt;/span&gt; self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;localUserId&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+                    message &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; Message&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;event&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&apos;Sender&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; event&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&apos;Content&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; event&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&apos;Time&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; event&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&apos;ChannelId&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+                    callback&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;message&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+
+    &lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;startStreaming&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; channelId&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; callback&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;requestThread &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; threading&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;Thread&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;target&lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;_getEvents&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; args &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;channelId&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; callback&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+        self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;requestThread&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;start&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+
+    &lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;stopStreaming&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        self&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;running &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token boolean&quot;&gt;False&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+      &lt;/div&gt;
+&lt;h4&gt;What’s all this?&lt;/h4&gt;
+&lt;p&gt;Let’s breakdown the methods on by one. First off, the &lt;code class=&quot;language-text&quot;&gt;authenticate&lt;/code&gt; should be relatively self-explanatory, it makes a request to the authentication endpoint of the MindLink API in order to log on an agent. It’s going to keep a hold of the received token and send it back with each subsequent request (this needs to be renewed if it expires).&lt;/p&gt;
+&lt;p&gt;The &lt;code class=&quot;language-text&quot;&gt;getMessages&lt;/code&gt; method is going to read a certain number of messages from the messages endpoint for a specific channel. Similarly with the &lt;code class=&quot;language-text&quot;&gt;sendMessage&lt;/code&gt; method.&lt;/p&gt;
+&lt;p&gt;Then we get to the more complicated bits: &lt;code class=&quot;language-text&quot;&gt;_getEvents&lt;/code&gt; is a perpetually running method that repeatedly makes get requests to the events endpoint of the API, fetching new events for a given channel ID. This method is invoked from the public &lt;code class=&quot;language-text&quot;&gt;startStreaming&lt;/code&gt; method on a separate thread, and will keep that thread running forever until the &lt;code class=&quot;language-text&quot;&gt;stopStreaming&lt;/code&gt; method is invoked. As you can see, what happens with each event received is not defined by this class, but needs to be forwarded by the caller in the form of a callback.&lt;/p&gt;
+&lt;p&gt;Now that we’ve covered the core connection code, we’ll build a basic example of how to use it.&lt;/p&gt;
+&lt;h3&gt;MindLink + Rasa&lt;/h3&gt;
+&lt;p&gt;Let’s make a python script entry point file, this is the actual sauce that feeds the message content to the bot and posts back a respone:&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot;&gt;
+      &lt;pre class=&quot;language-python&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;&lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;handleMessage&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;message&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+    response &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; agent&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;handle_message&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;message&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;content&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+    connection&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;sendMessage&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;channelId&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; response&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; __name__ &lt;span class=&quot;token operator&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;__main__&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&apos;Loading Rasa agent (this may take a while).&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+    agent &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; Agent&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;load&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;dialogue_model&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; interpreter_model&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+
+    &lt;span class=&quot;token keyword&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&apos;Creating connection to MindLink.&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+    connection &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; ApiConnection&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;
+        u&lt;span class=&quot;token string&quot;&gt;&apos;http://localhost:8081&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+        u&lt;span class=&quot;token string&quot;&gt;&apos;userdomain\\moodbot&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+        u&lt;span class=&quot;token string&quot;&gt;&apos;some password&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+        u&lt;span class=&quot;token string&quot;&gt;&apos;moodbot_agent&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+        u&lt;span class=&quot;token string&quot;&gt;&apos;contact:moodbot@userdomain.local&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+
+    connection&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;authenticate&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+
+    connection&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;startStreaming&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;
+        channelId&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;token keyword&quot;&gt;lambda&lt;/span&gt; _&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; message&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; handleMessage&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;message&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+
+    &lt;span class=&quot;token builtin&quot;&gt;input&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&apos;Type anything to stop.\r\n&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+    connection&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;stopStreaming&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+      &lt;/div&gt;
+&lt;p&gt;This will “start” the API connection on a given channel, with some preconfigured agent settings and a given channel ID (in a real application these may be passed as command line arguments, read from file etc). For each message received in the channel, this will be forwarded to the Rasa bot and the response will be sent back to the channel.&lt;/p&gt;
+&lt;h2&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;We covered a fair amount of ground in this post, explaining why Rasa is interesting for enterprise development, touching on core Rasa bot development concepts and demonstrating a basic way to wire everything up the MindLink API.&lt;/p&gt;
+&lt;div class=&quot;footnotes&quot;&gt;
+&lt;hr&gt;
+&lt;ol&gt;
+&lt;li id=&quot;fn-1&quot;&gt;
+&lt;p&gt;This is a condensed version of &lt;a href=&quot;https://core.rasa.com/tutorial_basics.html&quot;&gt;this short tutorial&lt;/a&gt;.&lt;/p&gt;
+&lt;a href=&quot;#fnref-1&quot; class=&quot;footnote-backref&quot;&gt;↩&lt;/a&gt;
+&lt;/li&gt;
+&lt;li id=&quot;fn-2&quot;&gt;
+&lt;p&gt;Note that we’re using extremely limited sample data here, the classification and response selection performance is almost certainly going to be disappointing. A lot of data is necessary before satisfactory performance is achieved.&lt;/p&gt;
+&lt;a href=&quot;#fnref-2&quot; class=&quot;footnote-backref&quot;&gt;↩&lt;/a&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;</content:encoded></item><item><title><![CDATA[Why DraftJS doesn't work on Android]]></title><description><![CDATA[DraftJS  is a popular open source rich text editing library for React maintained by Facebook. It allows developers to decorate input text as…]]></description><link>https://engineering.mindlinksoft.comwhy-draftjs-doesnt-work-on-android</link><guid isPermaLink="false">https://engineering.mindlinksoft.comwhy-draftjs-doesnt-work-on-android</guid><pubDate>Sun, 22 Apr 2018 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;&lt;a href=&quot;https://draftjs.org/&quot;&gt;DraftJS&lt;/a&gt; is a popular open source rich text editing library for React maintained by Facebook. It allows developers to decorate input text as the user types, and provides a way to embed metadata into the decorated text (e.g. a URL.) Also supports commands, keyboard shortcuts …&lt;/p&gt;
 &lt;p&gt;All of these rich development features come with a caveat however: mobile browsers are not officially supported. This means that if you’re developing your mobile applications as wrapped web applications via &lt;a href=&quot;https://cordova.apache.org/&quot;&gt;Cordova&lt;/a&gt; (or &lt;a href=&quot;https://phonegap.com/&quot;&gt;Phonegap&lt;/a&gt;, or &lt;a href=&quot;https://ionicframework.com/&quot;&gt;Ionic&lt;/a&gt;) then you’re probably out of luck.&lt;/p&gt;
 &lt;p&gt;This post is about &lt;em&gt;why&lt;/em&gt; the way Draft works is in principle incompatible with the Google virtual keyboard which is the default on certain Android devices. Supporting multiple mobile operating systems with the same code-base is one of the main reasons why to use Cordova (or similar) in the first place, so you are likely to want to use the same rich text editing library across them all&lt;sup id=&quot;fnref-1&quot;&gt;&lt;a href=&quot;#fn-1&quot; class=&quot;footnote-ref&quot;&gt;1&lt;/a&gt;&lt;/sup&gt;.&lt;/p&gt;
 &lt;h2&gt;An eventful experience&lt;/h2&gt;
