@@ -1,4 +1,315 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Engineering at MindLink]]></title><description><![CDATA[Insights and musings from the MindLink software engineers]]></description><link>https://engineering.mindlinksoft.com</link><generator>RSS for Node</generator><lastBuildDate>Thu, 21 Jun 2018 11:41:29 GMT</lastBuildDate><item><title><![CDATA[End-To-End Encryption with the Signal Protocol]]></title><description><![CDATA[What is the Signal Protocol? The Signal Protocol (formerly TextSecure Protocol) defines a cryptographic encryption protocol for secure end…]]></description><link>https://engineering.mindlinksoft.comend-to-end-encryption-with-the-signal-protocol</link><guid isPermaLink="false">https://engineering.mindlinksoft.comend-to-end-encryption-with-the-signal-protocol</guid><pubDate>Wed, 20 Jun 2018 10:15:00 GMT</pubDate><content:encoded>&lt;h2&gt;What is the Signal Protocol?&lt;/h2&gt;
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Engineering at MindLink]]></title><description><![CDATA[Insights and musings from the MindLink software engineers]]></description><link>https://engineering.mindlinksoft.com</link><generator>RSS for Node</generator><lastBuildDate>Thu, 28 Jun 2018 14:46:41 GMT</lastBuildDate><item><title><![CDATA[Improving our CI tests]]></title><description><![CDATA[This is the story of how we: Enabled parallel NUnit test execution Migrated our CI test stack to a reproduceable and self-contained…]]></description><link>https://engineering.mindlinksoft.comimproving-our-ci-tests</link><guid isPermaLink="false">https://engineering.mindlinksoft.comimproving-our-ci-tests</guid><pubDate>Thu, 28 Jun 2018 13:10:00 GMT</pubDate><content:encoded>&lt;p&gt;This is the story of how we:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Enabled parallel NUnit test execution&lt;/li&gt;
+&lt;li&gt;Migrated our CI test stack to a reproduceable and self-contained configuration&lt;/li&gt;
+&lt;li&gt;Reduced our CI test run time by 65%&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Background&lt;/h2&gt;
+&lt;p&gt;The MindLink .NET CI/test stack looks like:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;TFS 2018&lt;/li&gt;
+&lt;li&gt;NUnit&lt;/li&gt;
+&lt;li&gt;Moq&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;For our main product repository, we have a CI build that runs on every server-side change. This builds our .NET components and then runs our tests. The tests are split between what we call “Unit Tests” and “Behaviour Tests”. The “Behaviour Tests” are still isolated in-memory tests, but run over chunky bits of the stack across component-level test seams. I’ll argue with you about what these should be called another time.&lt;/p&gt;
+&lt;p&gt;Our timings looked like this:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Unit Tests - 18982 tests - 7:56 minutes&lt;/li&gt;
+&lt;li&gt;Behaviour Tests - 1769 tests - 3:34 minutes&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;
+  &lt;a
+    class=&quot;gatsby-resp-image-link&quot;
+    href=&quot;/static/build-summary-initial-f6ac8293b032f89d16e6b8ece138dcc4-dd63b.png&quot;
+    style=&quot;display: block&quot;
+    target=&quot;_blank&quot;
+    rel=&quot;noopener&quot;
+  &gt;
+  
+  &lt;span
+    class=&quot;gatsby-resp-image-wrapper&quot;
+    style=&quot;position: relative; display: block; ; max-width: 590px; margin-left: auto; margin-right: auto;&quot;
+  &gt;
+    &lt;span
+      class=&quot;gatsby-resp-image-background-image&quot;
+      style=&quot;padding-bottom: 44.60616438356164%; position: relative; bottom: 0; left: 0; background-image: url(&apos;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAJCAYAAAAywQxIAAAACXBIWXMAAA7DAAAOwwHHb6hkAAABZ0lEQVQoz32SSU/DMBCF8+c5oQIS914ocODImQtLBYfyAxASCKmoSZzFzub9MXZKoVB1pKdxRvGXNzNJ2r6HlAbGuCjvHUTLwaocrE6RsiWy8hMFz1CKHFXDUIgMjKfrc45WcpKIShwBBqWgtEWIZqgxvT3A1dMprhdTzO4nOLs7xMX8GLOHCc6D5kdRoRby5ePJRkmASAK2nYaxHorOi9cbvLw/I199IFu9ISVVxRI1OQ3qyFnXFlF9zGzMVE88fHQoWk3ZwjkPBLOU4nlPOEdj0hrWGCgpYy1BBErUQqIhl0obNE1FX20ghz5e8t7/UwitaVR0d+g7sHxFOzBIrLPo+hE20HJGYI2ioGETNFwKsQtojI6QgT5csCw6TRRZblpFcxyX4kFbFhUEr2n7EtbaDfA7fhzqCN0Cbr0U5kZb57xEXZWxnf1AFaEByLJ1y3/bCP9h37fUNt8J+/1srYmQMOcAD/Uv6TqwtOYiPtMAAAAASUVORK5CYII=&apos;); background-size: cover; display: block;&quot;
+    &gt;
+      &lt;img
+        class=&quot;gatsby-resp-image-image&quot;
+        style=&quot;width: 100%; height: 100%; margin: 0; vertical-align: middle; position: absolute; top: 0; left: 0; box-shadow: inset 0px 0px 0px 400px white;&quot;
+        alt=&quot;Build Summary&quot;
+        title=&quot;&quot;
+        src=&quot;/static/build-summary-initial-f6ac8293b032f89d16e6b8ece138dcc4-fb8a0.png&quot;
+        srcset=&quot;/static/build-summary-initial-f6ac8293b032f89d16e6b8ece138dcc4-1a291.png 148w,
+/static/build-summary-initial-f6ac8293b032f89d16e6b8ece138dcc4-2bc4a.png 295w,
+/static/build-summary-initial-f6ac8293b032f89d16e6b8ece138dcc4-fb8a0.png 590w,
+/static/build-summary-initial-f6ac8293b032f89d16e6b8ece138dcc4-526de.png 885w,
+/static/build-summary-initial-f6ac8293b032f89d16e6b8ece138dcc4-dd63b.png 1168w&quot;
+        sizes=&quot;(max-width: 590px) 100vw, 590px&quot;
+      /&gt;
+    &lt;/span&gt;
+  &lt;/span&gt;
+  
+  &lt;/a&gt;
+    &lt;/p&gt;
+&lt;p&gt;Whilst I’m sure there are definitely worst build times out there, a total time of 16 minutes definitely has room for improvement.&lt;/p&gt;
+&lt;p&gt;And yes, we can no doubt improve the 4:30 time for the core build, but that’s a different story.&lt;/p&gt;
+&lt;h2&gt;Parallelising Take 1&lt;/h2&gt;
+&lt;p&gt;Time to look at our test run configuration.&lt;/p&gt;
+&lt;p&gt;I was aware that the TFS Test runner will run tests in parallel - at the granularity of each test DLL. Our build servers have 2 processor cores. My presumption was that we could just enable parallelisation on our test task config, the test runner would farm off our 8 or so test DLLs to run in parallel (2 at a time), and we’d get a 2x speed up.&lt;/p&gt;
+&lt;p&gt;
+  &lt;a
+    class=&quot;gatsby-resp-image-link&quot;
+    href=&quot;/static/original-test-settings-801a7cd9d090f2f3f9dc34883e194046-dfab2.png&quot;
+    style=&quot;display: block&quot;
+    target=&quot;_blank&quot;
+    rel=&quot;noopener&quot;
+  &gt;
+  
+  &lt;span
+    class=&quot;gatsby-resp-image-wrapper&quot;
+    style=&quot;position: relative; display: block; ; max-width: 590px; margin-left: auto; margin-right: auto;&quot;
+  &gt;
+    &lt;span
+      class=&quot;gatsby-resp-image-background-image&quot;
+      style=&quot;padding-bottom: 63.0272952853598%; position: relative; bottom: 0; left: 0; background-image: url(&apos;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAANCAYAAACpUE5eAAAACXBIWXMAAA7DAAAOwwHHb6hkAAABB0lEQVQ4y51T2W6DMBD0//9iH9smTQMYX2vwNdk1tJX6BKw0soSsYY61ouAxjU/GAGM0SimQaa0x6n4eh6K4wloHIo/gLSgEJs2ote7EODXKU4KxFusSESNBFMe4kV4ZtS4BM1smCqzQIackulhhuQSV0orAqn6ykxG7TdDOQ0l237d3jI87nB7h5qnbvQq1cG5CNj8fmL5uGO6fiOSvE4rv9q9Ksfxr+yS4lKWvTORS5JSWJdcecrlSyroTsvVOKoT8bVO5XZLCjkK9fXgMk+25ee92la6vkHO2/0gu1oNQ2niM8uxmDS0tW4OFl1xIcs5d4anFLjltitiqZ0WiLPXl/pszb/kFKSz/MeElCzAAAAAASUVORK5CYII=&apos;); background-size: cover; display: block;&quot;
+    &gt;
+      &lt;img
+        class=&quot;gatsby-resp-image-image&quot;
+        style=&quot;width: 100%; height: 100%; margin: 0; vertical-align: middle; position: absolute; top: 0; left: 0; box-shadow: inset 0px 0px 0px 400px white;&quot;
+        alt=&quot;Original Test Settings&quot;
+        title=&quot;&quot;
+        src=&quot;/static/original-test-settings-801a7cd9d090f2f3f9dc34883e194046-fb8a0.png&quot;
+        srcset=&quot;/static/original-test-settings-801a7cd9d090f2f3f9dc34883e194046-1a291.png 148w,
+/static/original-test-settings-801a7cd9d090f2f3f9dc34883e194046-2bc4a.png 295w,
+/static/original-test-settings-801a7cd9d090f2f3f9dc34883e194046-fb8a0.png 590w,
+/static/original-test-settings-801a7cd9d090f2f3f9dc34883e194046-dfab2.png 806w&quot;
+        sizes=&quot;(max-width: 590px) 100vw, 590px&quot;
+      /&gt;
+    &lt;/span&gt;
+  &lt;/span&gt;
+  
+  &lt;/a&gt;
+    &lt;/p&gt;
+&lt;p&gt;To my surprise/dismay - the “Run tests in parallel” box was already checked. So why are the tests still so slow? Is the parallelism not actually working?&lt;/p&gt;
+&lt;p&gt;I unchecked the box and queued another run. Same test timings. So what’s going on?&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://blogs.msdn.microsoft.com/devops/2016/10/10/parallel-test-execution/&quot;&gt;This Blog&lt;/a&gt; helped me on my way (sort of). The parallel test run behaviour is a convoluted function of both the TFS GUI settings and the test .runsettings file. &lt;/p&gt;
+&lt;p&gt;Our .runsettings looked like&lt;/p&gt;
+&lt;p&gt;&lt;code class=&quot;language-text&quot;&gt;&amp;lt;MaxCpuCount&amp;gt;0&amp;lt;/MaxCpuCount&amp;gt;&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;which apparently enables parallelisation by default.&lt;/p&gt;
+&lt;p&gt;Removing the .runsettings file from the test config altogether gave me what I was expecting - The unit tests alone now took 13 minutes (just under twice as long as before).&lt;/p&gt;
+&lt;p&gt;In hindsight, I could observe the tests running in parallel as the test runner launched. This is the log with parallelisation enabled:&lt;/p&gt;
+&lt;p&gt;
+  &lt;a
+    class=&quot;gatsby-resp-image-link&quot;
+    href=&quot;/static/test-execution-parallel-632cd4fb77c20ee0dceb4f5a20b32343-6b4b8.png&quot;
+    style=&quot;display: block&quot;
+    target=&quot;_blank&quot;
+    rel=&quot;noopener&quot;
+  &gt;
+  
+  &lt;span
+    class=&quot;gatsby-resp-image-wrapper&quot;
+    style=&quot;position: relative; display: block; ; max-width: 590px; margin-left: auto; margin-right: auto;&quot;
+  &gt;
+    &lt;span
+      class=&quot;gatsby-resp-image-background-image&quot;
+      style=&quot;padding-bottom: 19.06614785992218%; position: relative; bottom: 0; left: 0; background-image: url(&apos;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAECAYAAACOXx+WAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAA0klEQVQY0yWQ6W6DMBCEef/nq5qAbXxgCLSlHDZ2EyGmu86P0R6Wvpl1pXUDZyWcUeicRt9bjA9P6jBQ//M9YltnHMeOnAJSivjLR1HOEc9nwnWdAK5SK6XuaNsaWtUEVnCuxWPoinyn4b0p8N/5CyGsOOKOGDYkMmA4zzkxOL+BBUYyWqD3FtPYk0EDqyWskbQzWCkhAxgUtqWAw75gXWbEuBUY6zxfqIT4hJI3GIZYStc7SHGDqN/7pv6geifTplyh6I37aRoKONE38Omc8kXQf4dVKtbXMrUbAAAAAElFTkSuQmCC&apos;); background-size: cover; display: block;&quot;
+    &gt;
+      &lt;img
+        class=&quot;gatsby-resp-image-image&quot;
+        style=&quot;width: 100%; height: 100%; margin: 0; vertical-align: middle; position: absolute; top: 0; left: 0; box-shadow: inset 0px 0px 0px 400px white;&quot;
+        alt=&quot;Parallel Test Execution&quot;
+        title=&quot;&quot;
+        src=&quot;/static/test-execution-parallel-632cd4fb77c20ee0dceb4f5a20b32343-fb8a0.png&quot;
+        srcset=&quot;/static/test-execution-parallel-632cd4fb77c20ee0dceb4f5a20b32343-1a291.png 148w,
+/static/test-execution-parallel-632cd4fb77c20ee0dceb4f5a20b32343-2bc4a.png 295w,
+/static/test-execution-parallel-632cd4fb77c20ee0dceb4f5a20b32343-fb8a0.png 590w,
+/static/test-execution-parallel-632cd4fb77c20ee0dceb4f5a20b32343-526de.png 885w,
+/static/test-execution-parallel-632cd4fb77c20ee0dceb4f5a20b32343-6b4b8.png 1028w&quot;
+        sizes=&quot;(max-width: 590px) 100vw, 590px&quot;
+      /&gt;
+    &lt;/span&gt;
+  &lt;/span&gt;
+  
+  &lt;/a&gt;
+    &lt;/p&gt;
+&lt;p&gt;And this is the log with parallelisation disabled:&lt;/p&gt;
+&lt;p&gt;
+  &lt;a
+    class=&quot;gatsby-resp-image-link&quot;
+    href=&quot;/static/test-execution-sequential-ce046a022d9acebe8c8739111dc3a0ac-cccd3.png&quot;
+    style=&quot;display: block&quot;
+    target=&quot;_blank&quot;
+    rel=&quot;noopener&quot;
+  &gt;
+  
+  &lt;span
+    class=&quot;gatsby-resp-image-wrapper&quot;
+    style=&quot;position: relative; display: block; ; max-width: 590px; margin-left: auto; margin-right: auto;&quot;
+  &gt;
+    &lt;span
+      class=&quot;gatsby-resp-image-background-image&quot;
+      style=&quot;padding-bottom: 19.414634146341463%; position: relative; bottom: 0; left: 0; background-image: url(&apos;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAECAYAAACOXx+WAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAyElEQVQY01WQ226DMBBE+f8fbDC+hkvcJE2aYggUwqntplX7MNrRSjtztIU1FU1rsUayt5K6Nviu5hDVRH86dlyvZ0K4MYQP7mNgHPo8p2n49fN8Bx4U1giaxmC0wNmKrnXRV7nAWZX3qfTt7BnHnnWZWZYp68enua6fbNtCYXQZqTRK7mKAxB8ahHhBVru4E2gl8L6LB9/HieKftjUHZT1ioHOK9klV7w3H1xYbqbQsUap8UpaZMr3gcjkR+ht9/57fkMj+FnwByoQs6eHe7PwAAAAASUVORK5CYII=&apos;); background-size: cover; display: block;&quot;
+    &gt;
+      &lt;img
+        class=&quot;gatsby-resp-image-image&quot;
+        style=&quot;width: 100%; height: 100%; margin: 0; vertical-align: middle; position: absolute; top: 0; left: 0; box-shadow: inset 0px 0px 0px 400px white;&quot;
+        alt=&quot;Sequential Test Execution&quot;
+        title=&quot;&quot;
+        src=&quot;/static/test-execution-sequential-ce046a022d9acebe8c8739111dc3a0ac-fb8a0.png&quot;
+        srcset=&quot;/static/test-execution-sequential-ce046a022d9acebe8c8739111dc3a0ac-1a291.png 148w,
+/static/test-execution-sequential-ce046a022d9acebe8c8739111dc3a0ac-2bc4a.png 295w,
+/static/test-execution-sequential-ce046a022d9acebe8c8739111dc3a0ac-fb8a0.png 590w,
+/static/test-execution-sequential-ce046a022d9acebe8c8739111dc3a0ac-526de.png 885w,
+/static/test-execution-sequential-ce046a022d9acebe8c8739111dc3a0ac-cccd3.png 1025w&quot;
+        sizes=&quot;(max-width: 590px) 100vw, 590px&quot;
+      /&gt;
+    &lt;/span&gt;
+  &lt;/span&gt;
+  
+  &lt;/a&gt;
+    &lt;/p&gt;
+&lt;p&gt;You can see it processing two DLL test containers at a time on test launch, and then subsequent test result logs overlap.&lt;/p&gt;
+&lt;p&gt;So - good news is: I’ve got to the bottom of what’s making the tests run in parallel. Bad news is: our tests runs are taking a long time even though they’re already running in parallel.&lt;/p&gt;
+&lt;h2&gt;Time for some housekeeping&lt;/h2&gt;
+&lt;p&gt;All this talk of test configuration got me thinking about our build dependencies.&lt;/p&gt;
+&lt;p&gt;We’re on the same path as a lot of teams with this one: we have several build servers that each have some global build dependencies installed. This means:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;When we make changes to the build, we need to make the same changes across all build servers&lt;/li&gt;
+&lt;li&gt;If we upgrade a build dependency for one branch, typically all the other branches start failing to build&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Our end goal however is:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Remove as many global build agent dependencies as possible&lt;/li&gt;
+&lt;li&gt;Define all build dependencies in source code as versioned package dependencies&lt;/li&gt;
+&lt;li&gt;Dynamically install and configure the build environment as part of the build itself&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;So couple of things to fix with our test configurations:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;.runSettings file&lt;/strong&gt; - This guy was defined at a well known path on the build server, and had to be kept in sync between all servers. He seems to have been superceded by the TFS test task configuration, and he’s wasn’t doing much anyway (other than making things more confusing). So time for him to go. Parallel execution of tests is enabled by the TFS task config.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Visual Studio Test Platform&lt;/strong&gt; - This was installed as part of Visual Studio on the build server. Ultimately we want to reduce our dependency on needing Visual Studio on the build server, and let the agents upgrade themselves as required. We switched this to be installed by the TFS build agent. &lt;/p&gt;
+&lt;p&gt;
+  &lt;a
+    class=&quot;gatsby-resp-image-link&quot;
+    href=&quot;/static/test-platform-settings-7aeaadfbf3558d7adba6434515e0f183-7492f.png&quot;
+    style=&quot;display: block&quot;
+    target=&quot;_blank&quot;
+    rel=&quot;noopener&quot;
+  &gt;
+  
+  &lt;span
+    class=&quot;gatsby-resp-image-wrapper&quot;
+    style=&quot;position: relative; display: block; ; max-width: 590px; margin-left: auto; margin-right: auto;&quot;
+  &gt;
+    &lt;span
+      class=&quot;gatsby-resp-image-background-image&quot;
+      style=&quot;padding-bottom: 15.254237288135593%; position: relative; bottom: 0; left: 0; background-image: url(&apos;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAADCAYAAACTWi8uAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAASklEQVQI152OyQ3AMAzDsv+0dXwV9aEm3aARwKcIDpqKOQkqDDNBxIPuxumGiIK3UBnuhsz8hKeM23fhBWGCm6KrUEta9ZP1yQy8Vp3sy6GLE94AAAAASUVORK5CYII=&apos;); background-size: cover; display: block;&quot;
+    &gt;
+      &lt;img
+        class=&quot;gatsby-resp-image-image&quot;
+        style=&quot;width: 100%; height: 100%; margin: 0; vertical-align: middle; position: absolute; top: 0; left: 0; box-shadow: inset 0px 0px 0px 400px white;&quot;
+        alt=&quot;Test Platform Settings&quot;
+        title=&quot;&quot;
+        src=&quot;/static/test-platform-settings-7aeaadfbf3558d7adba6434515e0f183-fb8a0.png&quot;
+        srcset=&quot;/static/test-platform-settings-7aeaadfbf3558d7adba6434515e0f183-1a291.png 148w,
+/static/test-platform-settings-7aeaadfbf3558d7adba6434515e0f183-2bc4a.png 295w,
+/static/test-platform-settings-7aeaadfbf3558d7adba6434515e0f183-fb8a0.png 590w,
+/static/test-platform-settings-7aeaadfbf3558d7adba6434515e0f183-526de.png 885w,
+/static/test-platform-settings-7aeaadfbf3558d7adba6434515e0f183-7492f.png 1003w&quot;
+        sizes=&quot;(max-width: 590px) 100vw, 590px&quot;
+      /&gt;
+    &lt;/span&gt;
+  &lt;/span&gt;
+  
+  &lt;/a&gt;
+    &lt;/p&gt;
+&lt;p&gt;This means adding another bootstrap step in the build tasks flow. In practice this task caches the installation between runs, so little extra overhead to the build process.&lt;/p&gt;
+&lt;p&gt;
+  &lt;a
+    class=&quot;gatsby-resp-image-link&quot;
+    href=&quot;/static/test-platform-installer-task-425b1c27823ceeb1ddce7d6b4a86f188-02305.png&quot;
+    style=&quot;display: block&quot;
+    target=&quot;_blank&quot;
+    rel=&quot;noopener&quot;
+  &gt;
+  
+  &lt;span
+    class=&quot;gatsby-resp-image-wrapper&quot;
+    style=&quot;position: relative; display: block; ; max-width: 590px; margin-left: auto; margin-right: auto;&quot;
+  &gt;
+    &lt;span
+      class=&quot;gatsby-resp-image-background-image&quot;
+      style=&quot;padding-bottom: 15.062111801242233%; position: relative; bottom: 0; left: 0; background-image: url(&apos;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAADCAYAAACTWi8uAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAkElEQVQI14XPOQrCQABA0dz/LAGvYC0KCqLZTEKSWbJvM4FU38FasXjth++1okWLmixPKasSpRVSSYQzr+vHYsxf/ThgrMFLzgWn4xX/4HO7P1DtQCE1pWpohpm6n5jM/tPoLNtOPy0uvOFlUUMUK4JMEqaS4CWIc80zKUmKBtltVK1x7FeqtyRi5RJ27sbyBnWz4CLUpDyrAAAAAElFTkSuQmCC&apos;); background-size: cover; display: block;&quot;
+    &gt;
+      &lt;img
+        class=&quot;gatsby-resp-image-image&quot;
+        style=&quot;width: 100%; height: 100%; margin: 0; vertical-align: middle; position: absolute; top: 0; left: 0; box-shadow: inset 0px 0px 0px 400px white;&quot;
+        alt=&quot;Test Platform Settings&quot;
+        title=&quot;&quot;
+        src=&quot;/static/test-platform-installer-task-425b1c27823ceeb1ddce7d6b4a86f188-fb8a0.png&quot;
+        srcset=&quot;/static/test-platform-installer-task-425b1c27823ceeb1ddce7d6b4a86f188-1a291.png 148w,
+/static/test-platform-installer-task-425b1c27823ceeb1ddce7d6b4a86f188-2bc4a.png 295w,
+/static/test-platform-installer-task-425b1c27823ceeb1ddce7d6b4a86f188-fb8a0.png 590w,
+/static/test-platform-installer-task-425b1c27823ceeb1ddce7d6b4a86f188-02305.png 644w&quot;
+        sizes=&quot;(max-width: 590px) 100vw, 590px&quot;
+      /&gt;
+    &lt;/span&gt;
+  &lt;/span&gt;
+  
+  &lt;/a&gt;
+    &lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;NUnit Test Adaptors&lt;/strong&gt; - We had these installed globally on each build server using the Visual Studio extension installer. I think this was the right decision when we intially set up the build servers, but the installing-as-nuget-dependency seems like the right way for us to go now. This will give us one less global dependency.&lt;/p&gt;
+&lt;p&gt;To do this, you just need to add the adaptor package to your test project’s NuGet package dependencies. Something does feel a little odd about adding another dependency &lt;em&gt;just because the build server needs it&lt;/em&gt;, but that’s ultimately the shift in thinking towards self-describing builds.&lt;/p&gt;
+&lt;p&gt;I’m also not in love with the fact that you technically only need to do this for &lt;em&gt;one project in the solution&lt;/em&gt; (I assume just so that when NuGet solution-restores everything it’s present in the packages folder), but I’ll let that one go for simplicity.&lt;/p&gt;
+&lt;h2&gt;Upgrading NUnit&lt;/h2&gt;
+&lt;p&gt;At this point I also decided to upgrade our test dependencies. We were using NUnit 3.6.0 at this stage. I updated our NuGet package config to bump this to the latest 3.10.0 libraries.&lt;/p&gt;
+&lt;p&gt;This did cause a couple of compilation errors, but nothing that wasn’t easily fixed with equivalent NUnit API constructs. I pushed and waited (16 minutes) for the build to finish.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;But the build only took 9 minutes&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;
+  &lt;a
+    class=&quot;gatsby-resp-image-link&quot;
+    href=&quot;/static/improved-build-time-43e45d56121fbcdf3e40bf8e4fc4162b-4adfa.png&quot;
+    style=&quot;display: block&quot;
+    target=&quot;_blank&quot;
+    rel=&quot;noopener&quot;
+  &gt;
+  
+  &lt;span
+    class=&quot;gatsby-resp-image-wrapper&quot;
+    style=&quot;position: relative; display: block; ; max-width: 590px; margin-left: auto; margin-right: auto;&quot;
+  &gt;
+    &lt;span
+      class=&quot;gatsby-resp-image-background-image&quot;
+      style=&quot;padding-bottom: 35.762331838565025%; position: relative; bottom: 0; left: 0; background-image: url(&apos;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAHCAYAAAAIy204AAAACXBIWXMAAA7DAAAOwwHHb6hkAAABEElEQVQoz4VRuU7EMBT0N/IFnH8ADTSI5Q8o4BfouCQatqahRFuDFljIsZvEd5xkeHY2RwFaS6PxGz+Nx8/s8HoLF09HuJwe42p6grPbXZzebBN2cH5/QNgPPCGe3O1tBHuePeDl9RHx/A3x5ztWiw+kX3MU0Td0lvaolQS0QrMGjAr1oMnAzFkLazWUNtAk2NLAVSWcsyhp38Fr1QglnfseV9lWq11gJmQejJqmwabVddR1Dc7zlosccbSAMSacMakKCE4QnG70yVww/w+doTE67JUUWC2TvmZcZCSkSOIfpElEI1FtmpFBn3Bde5Zk5JfgbULlZ+wNleIhoW8YG/w1gsFwSKjJKM+W9A/tk38B4DEI8UM5hqMAAAAASUVORK5CYII=&apos;); background-size: cover; display: block;&quot;
+    &gt;
+      &lt;img
+        class=&quot;gatsby-resp-image-image&quot;
+        style=&quot;width: 100%; height: 100%; margin: 0; vertical-align: middle; position: absolute; top: 0; left: 0; box-shadow: inset 0px 0px 0px 400px white;&quot;
+        alt=&quot;Test Platform Settings&quot;
+        title=&quot;&quot;
+        src=&quot;/static/improved-build-time-43e45d56121fbcdf3e40bf8e4fc4162b-fb8a0.png&quot;
+        srcset=&quot;/static/improved-build-time-43e45d56121fbcdf3e40bf8e4fc4162b-1a291.png 148w,
+/static/improved-build-time-43e45d56121fbcdf3e40bf8e4fc4162b-2bc4a.png 295w,
+/static/improved-build-time-43e45d56121fbcdf3e40bf8e4fc4162b-fb8a0.png 590w,
+/static/improved-build-time-43e45d56121fbcdf3e40bf8e4fc4162b-526de.png 885w,
+/static/improved-build-time-43e45d56121fbcdf3e40bf8e4fc4162b-4adfa.png 892w&quot;
+        sizes=&quot;(max-width: 590px) 100vw, 590px&quot;
+      /&gt;
+    &lt;/span&gt;
+  &lt;/span&gt;
+  
+  &lt;/a&gt;
+    &lt;/p&gt;
+&lt;p&gt;That’s right. The Unit tests now ran in 100 seconds, the Behaviour tests down to 2 minutes. You can see the difference between the build times from the test graph.&lt;/p&gt;
+&lt;p&gt;After some digging, I &lt;em&gt;think&lt;/em&gt; it’s &lt;a href=&quot;https://github.com/nunit/nunit/issues/2217&quot;&gt;this issue&lt;/a&gt; that was the culprit. Indeed, even when I run from Resharper in Visual Studio, the tests now run lightning fast.&lt;/p&gt;
+&lt;h2&gt;Concluding&lt;/h2&gt;
+&lt;p&gt;I didn’t expect this investigation to turn out like this - our problems were solved just by upgrading our NUnit dependency.&lt;/p&gt;
+&lt;p&gt;On the other hand, we did clean up our test configuration and dependencies, and double-checked that we’re running our tests in parallel.&lt;/p&gt;
+&lt;p&gt;Moral of the story is:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Make sure you’re on at least NUnit 3.8 so your tests run correctly!&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Next time: Further test parallelisation&lt;/p&gt;</content:encoded></item><item><title><![CDATA[End-To-End Encryption with the Signal Protocol]]></title><description><![CDATA[What is the Signal Protocol? The Signal Protocol (formerly TextSecure Protocol) defines a cryptographic encryption protocol for secure end…]]></description><link>https://engineering.mindlinksoft.comend-to-end-encryption-with-the-signal-protocol</link><guid isPermaLink="false">https://engineering.mindlinksoft.comend-to-end-encryption-with-the-signal-protocol</guid><pubDate>Wed, 20 Jun 2018 10:15:00 GMT</pubDate><content:encoded>&lt;h2&gt;What is the Signal Protocol?&lt;/h2&gt;
 &lt;p&gt;The Signal Protocol (formerly TextSecure Protocol) defines a cryptographic encryption protocol for secure end-to-end encryption (E2EE). It was created by Open Whisper Systems for use in their secure messaging app TextSecure but has since been released, open-source, to the wider community. It has become hugely popular amongst consumer applications and has earned its name as the de facto standard for securing messaging and voice and video communications. Some of the largest adopters include Google Allo, Facebook Messenger and WhatsApp, but more and more organizations are embracing E2EE everyday as concerns surrounding privacy, security and surveillance increasingly find themselves centre-stage in the public eye.&lt;/p&gt;
 &lt;p&gt;In simple terms, E2EE allows us to ensure our data is only visibile to its intended recipient; the data is encrypted on the client on the user’s own device before it is even sent over the wire. This means that all the infrastructure in the middle (routing, messaging servers, databases etc.) will never get to see your data in its raw form! And this is great — it means we can completely eliminate the element of trust between client and server so users no longer have to worry about whether their data is truly safe in the hands of their messaging provider. More importantly though, it means that any third party trying to intercept a user’s communications in transit will surely fail!&lt;/p&gt;
 &lt;h2&gt;Give me an example.&lt;/h2&gt;
