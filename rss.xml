@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Engineering at MindLink]]></title><description><![CDATA[Insights and musings from the MindLink software engineers]]></description><link>https://engineering.mindlinksoft.com</link><generator>RSS for Node</generator><lastBuildDate>Thu, 28 Jun 2018 14:46:41 GMT</lastBuildDate><item><title><![CDATA[Improving our CI tests]]></title><description><![CDATA[This is the story of how we: Enabled parallel NUnit test execution Migrated our CI test stack to a reproduceable and self-contained…]]></description><link>https://engineering.mindlinksoft.comimproving-our-ci-tests</link><guid isPermaLink="false">https://engineering.mindlinksoft.comimproving-our-ci-tests</guid><pubDate>Thu, 28 Jun 2018 13:10:00 GMT</pubDate><content:encoded>&lt;p&gt;This is the story of how we:&lt;/p&gt;
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Engineering at MindLink]]></title><description><![CDATA[Insights and musings from the MindLink software engineers]]></description><link>https://engineering.mindlinksoft.com</link><generator>RSS for Node</generator><lastBuildDate>Fri, 29 Jun 2018 08:25:03 GMT</lastBuildDate><item><title><![CDATA[Improving our CI tests]]></title><description><![CDATA[This is the story of how we: Enabled parallel NUnit test execution Migrated our CI test stack to a reproduceable and self-contained…]]></description><link>https://engineering.mindlinksoft.comimproving-our-ci-tests</link><guid isPermaLink="false">https://engineering.mindlinksoft.comimproving-our-ci-tests</guid><pubDate>Thu, 28 Jun 2018 13:10:00 GMT</pubDate><content:encoded>&lt;p&gt;This is the story of how we:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;Enabled parallel NUnit test execution&lt;/li&gt;
 &lt;li&gt;Migrated our CI test stack to a reproduceable and self-contained configuration&lt;/li&gt;
@@ -244,7 +244,7 @@
       &lt;img
         class=&quot;gatsby-resp-image-image&quot;
         style=&quot;width: 100%; height: 100%; margin: 0; vertical-align: middle; position: absolute; top: 0; left: 0; box-shadow: inset 0px 0px 0px 400px white;&quot;
-        alt=&quot;Test Platform Settings&quot;
+        alt=&quot;Test Platform Installer Task&quot;
         title=&quot;&quot;
         src=&quot;/static/test-platform-installer-task-425b1c27823ceeb1ddce7d6b4a86f188-fb8a0.png&quot;
         srcset=&quot;/static/test-platform-installer-task-425b1c27823ceeb1ddce7d6b4a86f188-1a291.png 148w,
@@ -260,6 +260,40 @@
     &lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;NUnit Test Adaptors&lt;/strong&gt; - We had these installed globally on each build server using the Visual Studio extension installer. I think this was the right decision when we intially set up the build servers, but the installing-as-nuget-dependency seems like the right way for us to go now. This will give us one less global dependency.&lt;/p&gt;
 &lt;p&gt;To do this, you just need to add the adaptor package to your test project’s NuGet package dependencies. Something does feel a little odd about adding another dependency &lt;em&gt;just because the build server needs it&lt;/em&gt;, but that’s ultimately the shift in thinking towards self-describing builds.&lt;/p&gt;
+&lt;p&gt;
+  &lt;a
+    class=&quot;gatsby-resp-image-link&quot;
+    href=&quot;/static/nunit-test-adaptor-nuget-725b45e7859bf262a5a083a41b902afd-de96f.png&quot;
+    style=&quot;display: block&quot;
+    target=&quot;_blank&quot;
+    rel=&quot;noopener&quot;
+  &gt;
+  
+  &lt;span
+    class=&quot;gatsby-resp-image-wrapper&quot;
+    style=&quot;position: relative; display: block; ; max-width: 590px; margin-left: auto; margin-right: auto;&quot;
+  &gt;
+    &lt;span
+      class=&quot;gatsby-resp-image-background-image&quot;
+      style=&quot;padding-bottom: 4.058441558441558%; position: relative; bottom: 0; left: 0; background-image: url(&apos;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAABCAYAAADeko4lAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAARUlEQVQI1wXBAQqAIBAAwf7/SvHy0DMElRJK3WaO5hyfZSw8SIAUNyIb7+FuAy5jxUSxgUYYpcMpLFUQz0yZbBPVTa0vP/jQS+DoIDiuAAAAAElFTkSuQmCC&apos;); background-size: cover; display: block;&quot;
+    &gt;
+      &lt;img
+        class=&quot;gatsby-resp-image-image&quot;
+        style=&quot;width: 100%; height: 100%; margin: 0; vertical-align: middle; position: absolute; top: 0; left: 0; box-shadow: inset 0px 0px 0px 400px white;&quot;
+        alt=&quot;NUnit Test Nuget Package&quot;
+        title=&quot;&quot;
+        src=&quot;/static/nunit-test-adaptor-nuget-725b45e7859bf262a5a083a41b902afd-fb8a0.png&quot;
+        srcset=&quot;/static/nunit-test-adaptor-nuget-725b45e7859bf262a5a083a41b902afd-1a291.png 148w,
+/static/nunit-test-adaptor-nuget-725b45e7859bf262a5a083a41b902afd-2bc4a.png 295w,
+/static/nunit-test-adaptor-nuget-725b45e7859bf262a5a083a41b902afd-fb8a0.png 590w,
+/static/nunit-test-adaptor-nuget-725b45e7859bf262a5a083a41b902afd-de96f.png 616w&quot;
+        sizes=&quot;(max-width: 590px) 100vw, 590px&quot;
+      /&gt;
+    &lt;/span&gt;
+  &lt;/span&gt;
+  
+  &lt;/a&gt;
+    &lt;/p&gt;
 &lt;p&gt;I’m also not in love with the fact that you technically only need to do this for &lt;em&gt;one project in the solution&lt;/em&gt; (I assume just so that when NuGet solution-restores everything it’s present in the packages folder), but I’ll let that one go for simplicity.&lt;/p&gt;
 &lt;h2&gt;Upgrading NUnit&lt;/h2&gt;
 &lt;p&gt;At this point I also decided to upgrade our test dependencies. We were using NUnit 3.6.0 at this stage. I updated our NuGet package config to bump this to the latest 3.10.0 libraries.&lt;/p&gt;
@@ -285,7 +319,7 @@
       &lt;img
         class=&quot;gatsby-resp-image-image&quot;
         style=&quot;width: 100%; height: 100%; margin: 0; vertical-align: middle; position: absolute; top: 0; left: 0; box-shadow: inset 0px 0px 0px 400px white;&quot;
-        alt=&quot;Test Platform Settings&quot;
+        alt=&quot;Improved Build Time&quot;
         title=&quot;&quot;
         src=&quot;/static/improved-build-time-43e45d56121fbcdf3e40bf8e4fc4162b-fb8a0.png&quot;
         srcset=&quot;/static/improved-build-time-43e45d56121fbcdf3e40bf8e4fc4162b-1a291.png 148w,
@@ -300,7 +334,7 @@
   
   &lt;/a&gt;
     &lt;/p&gt;
-&lt;p&gt;That’s right. The Unit tests now ran in 100 seconds, the Behaviour tests down to 2 minutes. You can see the difference between the build times from the test graph.&lt;/p&gt;
+&lt;p&gt;That’s right. The Unit tests now ran in 100 seconds, the Behaviour tests down to 2 minutes. You can see the difference between the build times from the build summary graph (the first two builds are before we upgraded NUnit).&lt;/p&gt;
 &lt;p&gt;After some digging, I &lt;em&gt;think&lt;/em&gt; it’s &lt;a href=&quot;https://github.com/nunit/nunit/issues/2217&quot;&gt;this issue&lt;/a&gt; that was the culprit. Indeed, even when I run from Resharper in Visual Studio, the tests now run lightning fast.&lt;/p&gt;
 &lt;h2&gt;Concluding&lt;/h2&gt;
 &lt;p&gt;I didn’t expect this investigation to turn out like this - our problems were solved just by upgrading our NUnit dependency.&lt;/p&gt;
