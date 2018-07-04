@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Engineering at MindLink]]></title><description><![CDATA[Insights and musings from the MindLink software engineers]]></description><link>https://engineering.mindlinksoft.com</link><generator>RSS for Node</generator><lastBuildDate>Wed, 04 Jul 2018 12:32:53 GMT</lastBuildDate><item><title><![CDATA[Improving our CI tests]]></title><description><![CDATA[This is the story of how we: Enabled parallel NUnit test execution Migrated our CI test stack to a reproduceable and self-contained…]]></description><link>https://engineering.mindlinksoft.comimproving-our-ci-tests</link><guid isPermaLink="false">https://engineering.mindlinksoft.comimproving-our-ci-tests</guid><pubDate>Thu, 28 Jun 2018 13:10:00 GMT</pubDate><content:encoded>&lt;p&gt;This is the story of how we:&lt;/p&gt;
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Engineering at MindLink]]></title><description><![CDATA[Insights and musings from the MindLink software engineers]]></description><link>https://engineering.mindlinksoft.com</link><generator>RSS for Node</generator><lastBuildDate>Wed, 04 Jul 2018 13:42:48 GMT</lastBuildDate><item><title><![CDATA[Improving our CI tests]]></title><description><![CDATA[This is the story of how we: Enabled parallel NUnit test execution Migrated our CI test stack to a reproduceable and self-contained…]]></description><link>https://engineering.mindlinksoft.comimproving-our-ci-tests</link><guid isPermaLink="false">https://engineering.mindlinksoft.comimproving-our-ci-tests</guid><pubDate>Thu, 28 Jun 2018 13:10:00 GMT</pubDate><content:encoded>&lt;p&gt;This is the story of how we:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;Enabled parallel NUnit test execution&lt;/li&gt;
 &lt;li&gt;Migrated our CI test stack to a reproduceable and self-contained configuration&lt;/li&gt;
@@ -52,7 +52,7 @@
   
   &lt;/a&gt;
     &lt;/p&gt;
-&lt;p&gt;Whilst I’m sure there are definitely worst build times out there, a total time of 16 minutes definitely has room for improvement.&lt;/p&gt;
+&lt;p&gt;Whilst I’m sure there are definitely worse build times out there, a total time of 16 minutes definitely has room for improvement.&lt;/p&gt;
 &lt;p&gt;And yes, we can no doubt improve the 4:30 time for the core build, but that’s a different story.&lt;/p&gt;
 &lt;h2&gt;Parallelising Take 1&lt;/h2&gt;
 &lt;p&gt;Time to look at our test run configuration.&lt;/p&gt;
@@ -186,7 +186,7 @@
 &lt;li&gt;Dynamically install and configure the build environment as part of the build itself&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;So couple of things to fix with our test configurations:&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;.runSettings file&lt;/strong&gt; - This guy was defined at a well known path on the build server, and had to be kept in sync between all servers. He seems to have been superceded by the TFS test task configuration, and he’s wasn’t doing much anyway (other than making things more confusing). So time for him to go. Parallel execution of tests is enabled by the TFS task config.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;.runSettings file&lt;/strong&gt; - This guy was defined at a well known path on the build server, and had to be kept in sync between all servers. He seems to have been superceded by the TFS test task configuration, and he wasn’t doing much anyway (other than making things more confusing). So time for him to go. Parallel execution of tests is enabled by the TFS task config.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;Visual Studio Test Platform&lt;/strong&gt; - This was installed as part of Visual Studio on the build server. Ultimately we want to reduce our dependency on needing Visual Studio on the build server, and let the agents upgrade themselves as required. We switched this to be installed by the TFS build agent. &lt;/p&gt;
 &lt;p&gt;
   &lt;a
@@ -223,7 +223,7 @@
   
   &lt;/a&gt;
     &lt;/p&gt;
-&lt;p&gt;This means adding another bootstrap step in the build tasks flow. In practice this task caches the installation between runs, so little extra overhead to the build process.&lt;/p&gt;
+&lt;p&gt;This means adding another bootstrap step in the build tasks flow. In practice this task caches the installation between runs, so little extra overhead is added to the build process.&lt;/p&gt;
 &lt;p&gt;
   &lt;a
     class=&quot;gatsby-resp-image-link&quot;
