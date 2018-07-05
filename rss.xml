@@ -1,4 +1,267 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Engineering at MindLink]]></title><description><![CDATA[Insights and musings from the MindLink software engineers]]></description><link>https://engineering.mindlinksoft.com</link><generator>RSS for Node</generator><lastBuildDate>Wed, 04 Jul 2018 13:42:48 GMT</lastBuildDate><item><title><![CDATA[Improving our CI tests]]></title><description><![CDATA[This is the story of how we: Enabled parallel NUnit test execution Migrated our CI test stack to a reproduceable and self-contained…]]></description><link>https://engineering.mindlinksoft.comimproving-our-ci-tests</link><guid isPermaLink="false">https://engineering.mindlinksoft.comimproving-our-ci-tests</guid><pubDate>Thu, 28 Jun 2018 13:10:00 GMT</pubDate><content:encoded>&lt;p&gt;This is the story of how we:&lt;/p&gt;
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Engineering at MindLink]]></title><description><![CDATA[Insights and musings from the MindLink software engineers]]></description><link>https://engineering.mindlinksoft.com</link><generator>RSS for Node</generator><lastBuildDate>Thu, 05 Jul 2018 09:24:10 GMT</lastBuildDate><item><title><![CDATA[Parallelizing our CI tests]]></title><description><![CDATA[In this second “improving our CI tests” blog we’ll complete our journey by: Enabling parallel NUnit test execution at the text-fixture…]]></description><link>https://engineering.mindlinksoft.comparallelizing-our-ci-tests</link><guid isPermaLink="false">https://engineering.mindlinksoft.comparallelizing-our-ci-tests</guid><pubDate>Thu, 05 Jul 2018 13:10:00 GMT</pubDate><content:encoded>&lt;p&gt;In this second “improving our CI tests” blog we’ll complete our journey by:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Enabling parallel NUnit test execution at the text-fixture granularity&lt;/li&gt;
+&lt;li&gt;Fixing some issues in our CI tests stack that prevented parallelisation&lt;/li&gt;
+&lt;li&gt;Reducing our CI test run time by a further 10%&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Background&lt;/h2&gt;
+&lt;p&gt;The MindLink .NET CI/test stack looks like:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;TFS 2018&lt;/li&gt;
+&lt;li&gt;NUnit&lt;/li&gt;
+&lt;li&gt;Moq&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;See the previous &lt;a href=&quot;../improving-our-ci-tests&quot;&gt;blog post&lt;/a&gt; about how we enabled test project-level parallelism and upgraded to NUnit 3.10.&lt;/p&gt;
+&lt;h2&gt;Parallelising Take 2&lt;/h2&gt;
+&lt;p&gt;NUnit 3 now supports running individual tests in parallel. This is at a different level of granularity to the project-level scope supported by the external test runners. We can choose which groups of tests are able to run in parallel by attaching &lt;code class=&quot;language-text&quot;&gt;[Parallelizable]&lt;/code&gt; attributes &lt;a href=&quot;https://github.com/nunit/docs/wiki/Parallelizable-Attribute&quot;&gt;at the correct level and scope&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;This has some interesting implications for your tests. With project-level granularity, your tests still run in the same environment as they would do otherwise - basically just entire isolated environments running in parallel.&lt;/p&gt;
+&lt;p&gt;Now, with test-level granularity &lt;em&gt;your tests&lt;/em&gt; need to make sure that they can run whilst other tests are running. This of course &lt;em&gt;should&lt;/em&gt; be the case for correctly designed Unit and in-memory component tests (and correctly designed code under test).&lt;/p&gt;
+&lt;p&gt;In our previous post, project-level parallelism gave us a 2x speed-up (on a 2-processor build server). In theory, turning on test-level parallelisation isn’t going to give us any greater speed up - there are still 2 cores to perform the synchronously-running tests, regardless of who and how is scheduling them.&lt;/p&gt;
+&lt;p&gt;However, we decided to look into this anyway because:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Unless the project-level distribution of the tests is &lt;em&gt;exactly equal&lt;/em&gt; across test projects, there will always be the case where there’s one test project left running after all the others have completed. At this stage, we will benefit from test-level parallelisation.&lt;/li&gt;
+&lt;li&gt;Developers running the tests individually from Resharper/Visual Studio will benefit from the test-level parallelisation.&lt;/li&gt;
+&lt;li&gt;We &lt;em&gt;should&lt;/em&gt; be able to turn on parallelisation - if our tests are written correctly - so it’s an interesting exercise to try.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Turning on Parrallelisation&lt;/h2&gt;
+&lt;blockquote&gt;
+&lt;p&gt;At this point in the blog I have typed the word “parallel” so many times I’m forgetting how to spell it.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;We need to decide at what level we can enable parallelisation. We have a couple of options, based on where we apply the &lt;code class=&quot;language-text&quot;&gt;[Parallelizable]&lt;/code&gt; attribute, and what scope we define.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Per-test - all tests can run parallel with each other&lt;/li&gt;
+&lt;li&gt;Per-test-fixture - all test fixtures can run parallel with each other, but tests inside run sequentially&lt;/li&gt;
+&lt;li&gt;Per-namespace - tests in different namespaces can be run in parallel, but tests inside the same namespace run sequentially&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The answer to the above depends on how you’ve written your tests. I think we’re in the same boat as most NUnit teams in that our test fixtures have state that is reset in each &lt;code class=&quot;language-text&quot;&gt;[SetUp]&lt;/code&gt; method (i.e. we have private fields in each test fixture class). On the up-side, each test depends on that state and that state alone.&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot;&gt;
+      &lt;pre class=&quot;language-c#&quot;&gt;&lt;code class=&quot;language-c#&quot;&gt;[TestFixture]
+public sealed class MyTestFixture
+{
+    private Mock&amp;lt;IMyDependentInterface&amp;gt; mockMyDependentInterface;
+
+    private MyClass myClass;
+
+    [SetUp]
+    public void SetUp()
+    {
+        this.mockMyDependentInterface = new Mock&amp;lt;IMyDependentInterface&amp;gt;();
+
+        this.myClass = new MyClass(this.mockMyDependentInterface.Object);
+    }
+
+    [Test]
+    public void DoingSomethingWhenSomethingDoesSomething()
+    {
+        this.mockMyDependentInterface.Setup(...);
+
+        Assert.That(
+            this.myClass.DoSomething(),
+            Is.EqualTo(Expected));
+    }
+}&lt;/code&gt;&lt;/pre&gt;
+      &lt;/div&gt;
+&lt;p&gt;I should point out that the goal with this work is to enable parallelization:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;With the minimum amount of work/changes/risk possible.&lt;/li&gt;
+&lt;li&gt;Zero changes to the actual code (i.e. outside of the tests).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;If we can’t achieve parallelization without either of the above being true, then we’ll abandon the exercise.&lt;/p&gt;
+&lt;p&gt;This leads me to the conclusion that we can run all test-fixtures in parallel, but tests inside each fixture must be run in sequence. This isn’t to say we can’t change individual test fixtures - or write new fixtures - to support per-test parallelization in future.&lt;/p&gt;
+&lt;p&gt;So to do this, I apply the &lt;code class=&quot;language-text&quot;&gt;[Parallelizable]&lt;/code&gt; to each of our test projects, at the assembly level. The Scope parameter is instructing that each test-fixture can be run in parallel, but no two tests inside each fixture can run at the same time.&lt;/p&gt;
+&lt;p&gt;&lt;code class=&quot;language-text&quot;&gt;[assembly: Parallelizable(ParallelScope.Fixtures)]&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;And low-and-behold, when I run chunks of test fixtures in Resharper, I can actually see multiple fixtures running in parallel.&lt;/p&gt;
+&lt;p&gt;
+  &lt;a
+    class=&quot;gatsby-resp-image-link&quot;
+    href=&quot;/static/parallel-running-00849fbe03616d34da4f76653ea0a107-6eb6a.png&quot;
+    style=&quot;display: block&quot;
+    target=&quot;_blank&quot;
+    rel=&quot;noopener&quot;
+  &gt;
+  
+  &lt;span
+    class=&quot;gatsby-resp-image-wrapper&quot;
+    style=&quot;position: relative; display: block; ; max-width: 547px; margin-left: auto; margin-right: auto;&quot;
+  &gt;
+    &lt;span
+      class=&quot;gatsby-resp-image-background-image&quot;
+      style=&quot;padding-bottom: 15.904936014625228%; position: relative; bottom: 0; left: 0; background-image: url(&apos;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAADCAIAAAAcOLh5AAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAlUlEQVQI12XJ0QqCMACF4b3/W0QYFHhTe4O60ASRXM41ajO3JJeFbpYVYZE3gvDdnP8AuFVwI8drNHOotYytFbE9NnWZ7YvftUB5j5qH2cgJJh6C/wLad/M0JT+T/JSIPc3lUWVC31T7egw0n0YHzA0TvyvA1PdLcQ136MBYjEkUYcaTVEhVFJU22tR9ZaUjjklKu/kFxN+eas7S9E4AAAAASUVORK5CYII=&apos;); background-size: cover; display: block;&quot;
+    &gt;
+      &lt;img
+        class=&quot;gatsby-resp-image-image&quot;
+        style=&quot;width: 100%; height: 100%; margin: 0; vertical-align: middle; position: absolute; top: 0; left: 0; box-shadow: inset 0px 0px 0px 400px white;&quot;
+        alt=&quot;Test Platform Settings&quot;
+        title=&quot;&quot;
+        src=&quot;/static/parallel-running-00849fbe03616d34da4f76653ea0a107-6eb6a.png&quot;
+        srcset=&quot;/static/parallel-running-00849fbe03616d34da4f76653ea0a107-d1e32.png 148w,
+/static/parallel-running-00849fbe03616d34da4f76653ea0a107-c5651.png 295w,
+/static/parallel-running-00849fbe03616d34da4f76653ea0a107-6eb6a.png 547w&quot;
+        sizes=&quot;(max-width: 547px) 100vw, 547px&quot;
+      /&gt;
+    &lt;/span&gt;
+  &lt;/span&gt;
+  
+  &lt;/a&gt;
+    &lt;/p&gt;
+&lt;p&gt;So with that, I push and that’s it!&lt;/p&gt;
+&lt;h2&gt;Problems&lt;/h2&gt;
+&lt;p&gt;Except it never is.&lt;/p&gt;
+&lt;h3&gt;Problem Number 1 - Static Variables&lt;/h3&gt;
+&lt;p&gt;The first thing that happens is 7 tests in the same namespace fail with the same error:&lt;/p&gt;
+&lt;p&gt;
+  &lt;a
+    class=&quot;gatsby-resp-image-link&quot;
+    href=&quot;/static/nullreference-exception-1-233509de7469615d5ed114cd00fe2c85-82ab5.png&quot;
+    style=&quot;display: block&quot;
+    target=&quot;_blank&quot;
+    rel=&quot;noopener&quot;
+  &gt;
+  
+  &lt;span
+    class=&quot;gatsby-resp-image-wrapper&quot;
+    style=&quot;position: relative; display: block; ; max-width: 590px; margin-left: auto; margin-right: auto;&quot;
+  &gt;
+    &lt;span
+      class=&quot;gatsby-resp-image-background-image&quot;
+      style=&quot;padding-bottom: 25.832223701731028%; position: relative; bottom: 0; left: 0; background-image: url(&apos;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAFCAYAAABFA8wzAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAx0lEQVQY03WOCw+CMAyE9///nG9NVF5KkIewAQKGwc52oDEmNvlyt6bdVWitofWAvu9hjMG7vv2/MmbEOA5fjBD5/YYodBC4B2TJBaqIUaoUSsaQeTy9ZUK9hHoT/JZ5REd0n/A3onmUNHwH67OrrXZtTVQ/WqNtZt+xL+1FvyVUkSFNQkrO5oUJXmjZN9Wn/5w/mqgoXOFRF6TSKoeJNPbhuxtcvB288wq+s7a4pyU8qyvruRfQHCvPOceFVSYM9rj6W9zCM15Ko31p80vLQwAAAABJRU5ErkJggg==&apos;); background-size: cover; display: block;&quot;
+    &gt;
+      &lt;img
+        class=&quot;gatsby-resp-image-image&quot;
+        style=&quot;width: 100%; height: 100%; margin: 0; vertical-align: middle; position: absolute; top: 0; left: 0; box-shadow: inset 0px 0px 0px 400px white;&quot;
+        alt=&quot;Nullreference Exception&quot;
+        title=&quot;&quot;
+        src=&quot;/static/nullreference-exception-1-233509de7469615d5ed114cd00fe2c85-fb8a0.png&quot;
+        srcset=&quot;/static/nullreference-exception-1-233509de7469615d5ed114cd00fe2c85-1a291.png 148w,
+/static/nullreference-exception-1-233509de7469615d5ed114cd00fe2c85-2bc4a.png 295w,
+/static/nullreference-exception-1-233509de7469615d5ed114cd00fe2c85-fb8a0.png 590w,
+/static/nullreference-exception-1-233509de7469615d5ed114cd00fe2c85-82ab5.png 751w&quot;
+        sizes=&quot;(max-width: 590px) 100vw, 590px&quot;
+      /&gt;
+    &lt;/span&gt;
+  &lt;/span&gt;
+  
+  &lt;/a&gt;
+    &lt;/p&gt;
+&lt;p&gt;I then come to the realisation: The tests that have failed are testing what can perhaps be described as &lt;em&gt;not the most up-to-date&lt;/em&gt; part of our codebase. In fact, there’s a particular set of static variables that the code under test relies apon.&lt;/p&gt;
+&lt;p&gt;In real life, these variables get initialized when the application starts up. In the test world, each test fixture initializes and tears down these static variables - and worse, each test fixture initializes the variables with &lt;em&gt;slightly different values&lt;/em&gt;. &lt;/p&gt;
+&lt;p&gt;Because the fixtures are now running concurrently, they’re overwriting the variables and it’s causing havoc with the code under test, and the mocked dependencies.&lt;/p&gt;
+&lt;p&gt;I have a couple of options to fix this - re-write the code under test to avoid the static variables, or fix the way the variables are initialized during the test runs. Removing the static variables breaks our rule that we shouldn’t be making any changes to the actual code. We’ll do this eventually at some point no doubt, but for now the least risk is to lift the initialization of these variables out of the test fixtures themselves. &lt;/p&gt;
+&lt;p&gt;NUnit has a &lt;code class=&quot;language-text&quot;&gt;[OneTimeSetUp]&lt;/code&gt; attribute that denotes a method used to initialize test-fixtures across a whole namespace. We already use this mechanism to alleviate the boilerplate set up of some our “cross-cutting” concerns, like logging. Introducing a new method just for this troublesome namespace allows me to lift the initialization of these static variables into one shared place.&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot;&gt;
+      &lt;pre class=&quot;language-c#&quot;&gt;&lt;code class=&quot;language-c#&quot;&gt;[OneTimeSetUp]
+public override void TestFixtureSetUp
+{
+    base.TestFixtureSetUp();
+
+    ChannelService.ChatConnectionChatRoomPrefix = DummyChatConnectionChatRoomPrefix;
+    ChannelService.ChatConnectionUserPrefix = DummyChatConnectionUserPrefix;
+}&lt;/code&gt;&lt;/pre&gt;
+      &lt;/div&gt;
+&lt;p&gt;I also remove the equivalent code from each of the offending child fixtures, and update the tests/mocks to understand these new constant values. If anything, this does more closely mirror how the code runs in real life.&lt;/p&gt;
+&lt;h3&gt;Problem Number 2 - Cross-Cutting Dependencies&lt;/h3&gt;
+&lt;p&gt;So I push the previous fix and all of a sudden more problems start occurring.&lt;/p&gt;
+&lt;p&gt;In particular, loads of errors like the below:&lt;/p&gt;
+&lt;p&gt;
+  &lt;a
+    class=&quot;gatsby-resp-image-link&quot;
+    href=&quot;/static/nullreference-exception-2-b08f6ad7278e791b3b3da23b5cda4768-e402a.png&quot;
+    style=&quot;display: block&quot;
+    target=&quot;_blank&quot;
+    rel=&quot;noopener&quot;
+  &gt;
+  
+  &lt;span
+    class=&quot;gatsby-resp-image-wrapper&quot;
+    style=&quot;position: relative; display: block; ; max-width: 590px; margin-left: auto; margin-right: auto;&quot;
+  &gt;
+    &lt;span
+      class=&quot;gatsby-resp-image-background-image&quot;
+      style=&quot;padding-bottom: 25.36945812807882%; position: relative; bottom: 0; left: 0; background-image: url(&apos;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAFCAYAAABFA8wzAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAA0UlEQVQY021R2Q6CMBDs//+XD+LxYkQBNR4gprSggLcw7i4YSbTJpLszk91Oqs5lgWNmkVqN++2K1/OBp+De4tHBt6+rCnVd/0DlJwN92EDHaxi9hU1CZHYPa0KkJhJwL1yrpaTxcD48pHvU5VIiz4+y9WNoTN+t6HCMqn0d/vhUtPPhTnoI5kP4MwdLb4SlP8KCbu5914E37Tc61QtvSPoYwWxA+gCrYNz6+titXaiyyCgCRzpQTIpoY6obcG2TvegmiaS2hvtYwJzwoof0Fxpvmeh65CzcvB8AAAAASUVORK5CYII=&apos;); background-size: cover; display: block;&quot;
+    &gt;
+      &lt;img
+        class=&quot;gatsby-resp-image-image&quot;
+        style=&quot;width: 100%; height: 100%; margin: 0; vertical-align: middle; position: absolute; top: 0; left: 0; box-shadow: inset 0px 0px 0px 400px white;&quot;
+        alt=&quot;Nullreference Exception&quot;
+        title=&quot;&quot;
+        src=&quot;/static/nullreference-exception-2-b08f6ad7278e791b3b3da23b5cda4768-fb8a0.png&quot;
+        srcset=&quot;/static/nullreference-exception-2-b08f6ad7278e791b3b3da23b5cda4768-1a291.png 148w,
+/static/nullreference-exception-2-b08f6ad7278e791b3b3da23b5cda4768-2bc4a.png 295w,
+/static/nullreference-exception-2-b08f6ad7278e791b3b3da23b5cda4768-fb8a0.png 590w,
+/static/nullreference-exception-2-b08f6ad7278e791b3b3da23b5cda4768-e402a.png 812w&quot;
+        sizes=&quot;(max-width: 590px) 100vw, 590px&quot;
+      /&gt;
+    &lt;/span&gt;
+  &lt;/span&gt;
+  
+  &lt;/a&gt;
+    &lt;/p&gt;
+&lt;p&gt;I come to the second realisation - we have cross-cutting behaviour that’s being mocked out individually in each test fixture. The test fixtures are again overwriting each other’s attempts at this global mocking.&lt;/p&gt;
+&lt;p&gt;Just to take a step back for a second:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Our code models certain cross-cutting concerns via a “service locator” pattern&lt;/li&gt;
+&lt;li&gt;The “service locator” is a global static instance. The locator’s implementation can vary, but it’s initialized when the application starts and you just always presume it’s there, and that you can fetch various services from it. So for example I can retrieve an ICatService implementation by going &lt;code class=&quot;language-text&quot;&gt;var myCatService = ServiceLocator.Instance.GetService&amp;lt;ICatService&amp;gt;()&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;This is about as awkward as it sounds. We have concrete dependencies on the ServiceLocator.Instance. We have no real control over which instances end up with references to which service implementation.&lt;/li&gt;
+&lt;li&gt;We’ve generally removed this pattern, but it is still used in a number of places for obtaining access to our &lt;code class=&quot;language-text&quot;&gt;ISchedulerService&lt;/code&gt; instance. This is pretty much used by anything that wants to schedule a callback - immediately on the threadpool, or as a timed callback etc.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;So we need to make sure this mechanism works when running our tests. This means in each test setup we have to:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Set the &lt;code class=&quot;language-text&quot;&gt;ServiceLocator.Instance&lt;/code&gt; guy as a stubbed &lt;code class=&quot;language-text&quot;&gt;IServiceLocator&lt;/code&gt; implementation that’ll let us register a &lt;code class=&quot;language-text&quot;&gt;ISchedulerService&lt;/code&gt; instance for retrieval by the code under test&lt;/li&gt;
+&lt;li&gt;Register a mock &lt;code class=&quot;language-text&quot;&gt;ISchedulerService&lt;/code&gt; with the stub service locator. We typically set up the &lt;code class=&quot;language-text&quot;&gt;ISchedulerService&lt;/code&gt;’s mocked behaviour as part of this (for instance, simulating the callback). The code under test will then retrieve this instance from the service locator instance.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;You can probably see where the problem is - test fixtures are competing for the mocking of the service locator instance.&lt;/p&gt;
+&lt;p&gt;Unfortunately this pattern is in a lot of places in the code, and it’s just not feasible to refactor away from this pattern in one fell swoop.&lt;/p&gt;
+&lt;p&gt;To fix this, we somehow need to mock a static instance, but keep how we’ve mocked that instance unique in the context of each parallely running test fixture. This sounds like something thready - but it’s worse than that: we use &lt;code class=&quot;language-text&quot;&gt;async/await&lt;/code&gt; a lot in the code, so tests don’t even necessarily run on their own thread. Rather, they run in their own async execution context.&lt;/p&gt;
+&lt;p&gt;At this point I give up and go to the pub.&lt;/p&gt;
+&lt;hr&gt;
+&lt;blockquote&gt;
+&lt;p&gt;About 3 pints in and it dawns on me.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;The first observation is that I need to stop each test-fixture overwriting the &lt;code class=&quot;language-text&quot;&gt;ServiceLocator.Instance&lt;/code&gt; singleton. This means we need to initialize this guy (with &lt;em&gt;something&lt;/em&gt;) once per test project.&lt;/p&gt;
+&lt;p&gt;Now - what do we set the global instance as? My second observation is that whatever it is, I need a way for each test fixture to register their own &lt;code class=&quot;language-text&quot;&gt;ISchedulerService&lt;/code&gt; instance with it, and for their code-under-test to see the same instance. So there needs to be a logical affinity between the test-code registering the service instance, and the code-under-test fetching the service instance. And this affinity needs to flow across async control flow.&lt;/p&gt;
+&lt;p&gt;&lt;code class=&quot;language-text&quot;&gt;System.Threading.AsyncLocal&amp;lt;T&amp;gt;&lt;/code&gt; to the rescue!&lt;/p&gt;
+&lt;p&gt;So I come up with this as my new global test fixture setup:&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot;&gt;
+      &lt;pre class=&quot;language-c#&quot;&gt;&lt;code class=&quot;language-c#&quot;&gt;public static readonly AsyncLocal&amp;lt;ISchedulerService&amp;gt; SchedulerServiceAsyncLocal = new AsyncLocal&amp;lt;ISchedulerService&amp;gt;();
+
+[OneTimeSetUp]
+public virtual void TestFixtureSetUp()
+{
+    var mockServiceLocator = new Mock&amp;lt;IServiceLocator&amp;gt;();
+
+    mockServiceLocator.Setup(sl =&amp;gt; sl.GetObjectOfType&amp;lt;ISchedulerService&amp;gt;())
+        .Returns(() =&amp;gt; SchedulerServiceAsyncLocal.Value);
+
+    ServiceLocator.Instance = mockServiceLocator.Object;
+}&lt;/code&gt;&lt;/pre&gt;
+      &lt;/div&gt;
+&lt;p&gt;To clarify:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;I’ve created a global &lt;code class=&quot;language-text&quot;&gt;AsyncLocal&lt;/code&gt; object that all the test fixtures can see and set their own &lt;code class=&quot;language-text&quot;&gt;ISchedulerService&lt;/code&gt; instance on.&lt;/li&gt;
+&lt;li&gt;I’ve created a mocked &lt;code class=&quot;language-text&quot;&gt;ServiceLocator&lt;/code&gt; object using &lt;a href=&quot;https://github.com/moq/moq4&quot;&gt;Moq&lt;/a&gt; that will serve requests for &lt;code class=&quot;language-text&quot;&gt;ISchedulerService&lt;/code&gt; instances by fetching the current value from the &lt;code class=&quot;language-text&quot;&gt;AsyncLocal&lt;/code&gt;. This mock &lt;code class=&quot;language-text&quot;&gt;ServiceLocator&lt;/code&gt; is initialized once per test project and shared across all concurrently running test fixtures.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Each test in a test fixture then registers its mock instance a la:&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot;&gt;
+      &lt;pre class=&quot;language-c#&quot;&gt;&lt;code class=&quot;language-c#&quot;&gt;var mockSchedulerService = new Mock&amp;lt;ISchedulerService&amp;gt;();
+SetUpFixture.SchedulerServiceAsyncLocal.Value = mockSchedulerService.Object;&lt;/code&gt;&lt;/pre&gt;
+      &lt;/div&gt;
+&lt;p&gt;This means that:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Each test can fiddle about with their own ISchedulerService mock instance, isolated from tests in other fixtures&lt;/li&gt;
+&lt;li&gt;All code under test (running in the same async execution flow) will get the same instance as the corresponding set up code registered.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;So we have the exact same static-mocking behaviour as before, but our test fixtures can run in parallel!&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;I’m actually strangely pleased with myself that I came up with this&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2&gt;Concluding&lt;/h2&gt;
+&lt;p&gt;So anyway, after that change all the tests started reliably passing. I don’t think the problems we found were actually too bad on a codebase of our size. Work to resolve the static references in the older bits of our codebase continues.&lt;/p&gt;
+&lt;p&gt;And now our build timings:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Unit tests - 1:44 (this actually isn’t any faster than our result from the &lt;a href=&quot;../improving-our-ci-tests&quot;&gt;first blog post&lt;/a&gt;, as predicted. Though this is a couple of weeks later, and we do have a few more tests now)&lt;/li&gt;
+&lt;li&gt;Behaviour tests - 1:36 (trimmed a minute off here - there’s more of an uneven distribution of tests between projects in this step)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;And running from Resharper is now faster than lightning!&lt;/p&gt;</content:encoded></item><item><title><![CDATA[Improving our CI tests]]></title><description><![CDATA[This is the story of how we: Enabled parallel NUnit test execution Migrated our CI test stack to a reproduceable and self-contained…]]></description><link>https://engineering.mindlinksoft.comimproving-our-ci-tests</link><guid isPermaLink="false">https://engineering.mindlinksoft.comimproving-our-ci-tests</guid><pubDate>Thu, 28 Jun 2018 13:10:00 GMT</pubDate><content:encoded>&lt;p&gt;This is the story of how we:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;Enabled parallel NUnit test execution&lt;/li&gt;
 &lt;li&gt;Migrated our CI test stack to a reproduceable and self-contained configuration&lt;/li&gt;

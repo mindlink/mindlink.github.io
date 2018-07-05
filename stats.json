@@ -37,8 +37,8 @@
       "path---why-draftjs-doesnt-work-on-android-919a9fa332b8d92d4d13.js.map"
     ],
     "path---index": [
-      "path---index-7d0f10aa9623268c7ed0.js",
-      "path---index-7d0f10aa9623268c7ed0.js.map"
+      "path---index-0c11cfccf08788170cba.js",
+      "path---index-0c11cfccf08788170cba.js.map"
     ],
     "path---custom-content-in-a-skype-for-business-conversation": [
       "path---custom-content-in-a-skype-for-business-conversation-f7bf51fb6fa1a5d44e17.js",
@@ -58,14 +58,18 @@
       "path---404-html-a0e39f21c11f6a62c5ab.js",
       "path---404-html-a0e39f21c11f6a62c5ab.js.map"
     ],
+    "path---parallelizing-our-ci-tests": [
+      "path---parallelizing-our-ci-tests-94f87b89aed1b5299e68.js",
+      "path---parallelizing-our-ci-tests-94f87b89aed1b5299e68.js.map"
+    ],
     "path---offline-plugin-app-shell-fallback": [
       "path---offline-plugin-app-shell-fallback-a0e39f21c11f6a62c5ab.js",
       "path---offline-plugin-app-shell-fallback-a0e39f21c11f6a62c5ab.js.map"
     ],
     "app": [
-      "app-0f65c6d999d262612cde.js",
+      "app-65fa27a05f5a59be5e77.js",
       "build-js-styles.css",
-      "app-0f65c6d999d262612cde.js.map",
+      "app-65fa27a05f5a59be5e77.js.map",
       "build-js-styles.css.map"
     ],
     "path---publishing-to-github-pages-from-tfs": [
@@ -77,8 +81,8 @@
       "path---404-a0e39f21c11f6a62c5ab.js.map"
     ],
     "path---improving-our-ci-tests": [
-      "path---improving-our-ci-tests-c6a08ee9cf24b6900af7.js",
-      "path---improving-our-ci-tests-c6a08ee9cf24b6900af7.js.map"
+      "path---improving-our-ci-tests-d2f4fc00703179cdff34.js",
+      "path---improving-our-ci-tests-d2f4fc00703179cdff34.js.map"
     ]
   }
 }
