@@ -20,6 +20,10 @@
       "path----93acfddfa4afcd4dbca4.js",
       "path----93acfddfa4afcd4dbca4.js.map"
     ],
+    "path---getting-started-with-python-and-the-mindlink-api": [
+      "path---getting-started-with-python-and-the-mindlink-api-6195563f285cf2bf976b.js",
+      "path---getting-started-with-python-and-the-mindlink-api-6195563f285cf2bf976b.js.map"
+    ],
     "component---node-modules-gatsby-plugin-offline-app-shell-js": [
       "component---node-modules-gatsby-plugin-offline-app-shell-js-5c4c5a0f7af9dc69d6d7.js",
       "component---node-modules-gatsby-plugin-offline-app-shell-js-5c4c5a0f7af9dc69d6d7.js.map"
@@ -37,8 +41,8 @@
       "path---why-draftjs-doesnt-work-on-android-919a9fa332b8d92d4d13.js.map"
     ],
     "path---index": [
-      "path---index-4da89a826db296e7b711.js",
-      "path---index-4da89a826db296e7b711.js.map"
+      "path---index-7053bfa1ba0025b4841f.js",
+      "path---index-7053bfa1ba0025b4841f.js.map"
     ],
     "path---custom-content-in-a-skype-for-business-conversation": [
       "path---custom-content-in-a-skype-for-business-conversation-f7bf51fb6fa1a5d44e17.js",
@@ -63,17 +67,17 @@
       "path---404-html-a0e39f21c11f6a62c5ab.js.map"
     ],
     "path---parallelizing-our-ci-tests": [
-      "path---parallelizing-our-ci-tests-1264ca00faca588151a0.js",
-      "path---parallelizing-our-ci-tests-1264ca00faca588151a0.js.map"
+      "path---parallelizing-our-ci-tests-12443dae833d0661bfa6.js",
+      "path---parallelizing-our-ci-tests-12443dae833d0661bfa6.js.map"
     ],
     "path---offline-plugin-app-shell-fallback": [
       "path---offline-plugin-app-shell-fallback-a0e39f21c11f6a62c5ab.js",
       "path---offline-plugin-app-shell-fallback-a0e39f21c11f6a62c5ab.js.map"
     ],
     "app": [
-      "app-67fea94210b363a85cd9.js",
+      "app-763d27f3b58a4b98dab9.js",
       "build-js-styles.css",
-      "app-67fea94210b363a85cd9.js.map",
+      "app-763d27f3b58a4b98dab9.js.map",
       "build-js-styles.css.map"
     ],
     "path---publishing-to-github-pages-from-tfs": [

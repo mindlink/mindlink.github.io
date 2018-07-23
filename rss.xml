@@ -1,4 +1,415 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Engineering at MindLink]]></title><description><![CDATA[Insights and musings from the MindLink software engineers]]></description><link>https://engineering.mindlinksoft.com</link><generator>RSS for Node</generator><lastBuildDate>Thu, 05 Jul 2018 11:56:18 GMT</lastBuildDate><item><title><![CDATA[Parallelizing our CI tests]]></title><description><![CDATA[In this second “improving our CI tests” blog we’ll complete our journey by: Enabling parallel NUnit test execution at the text-fixture…]]></description><link>https://engineering.mindlinksoft.comparallelizing-our-ci-tests</link><guid isPermaLink="false">https://engineering.mindlinksoft.comparallelizing-our-ci-tests</guid><pubDate>Thu, 05 Jul 2018 13:10:00 GMT</pubDate><content:encoded>&lt;p&gt;In this second “improving our CI tests” blog we’ll complete our journey by:&lt;/p&gt;
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Engineering at MindLink]]></title><description><![CDATA[Insights and musings from the MindLink software engineers]]></description><link>https://engineering.mindlinksoft.com</link><generator>RSS for Node</generator><lastBuildDate>Mon, 23 Jul 2018 15:22:14 GMT</lastBuildDate><item><title><![CDATA[Getting started with Python and the MindLink API.]]></title><description><![CDATA[Today, we’ll have a look at how I started coding in Python to work with the MindLink API. Although Python is an extremely popular language…]]></description><link>https://engineering.mindlinksoft.comgetting-started-with-python-and-the-mindlink-api</link><guid isPermaLink="false">https://engineering.mindlinksoft.comgetting-started-with-python-and-the-mindlink-api</guid><pubDate>Mon, 23 Jul 2018 17:10:00 GMT</pubDate><content:encoded>&lt;p&gt;Today, we’ll have a look at how I started coding in Python to work with the MindLink API.&lt;/p&gt;
+&lt;p&gt;Although Python is an extremely popular language, we, or at least I, haven’t used too much of it. When we started investigating the capabilities of the &lt;a href=&quot;https://rasa.com/&quot;&gt;Rasa Core platform&lt;/a&gt; as part of our &lt;a href=&quot;../rasa&quot;&gt;larger work around intelligent chat bots&lt;/a&gt;, we found out that they have a neat open source API, in Python. The next natural step for us was wanting to leverage the capabilities of the MindLink API (MLAPI for briefness) to provide the bot with voice and ears; while there are ways to use Rasa-Core in a language-agnostic way, we took the chance to dive into a bit of Python programming, beginners level.
+This post will document how I went from virtually no Python knowledge to writing a simple bot harness that connects to the MLAPI and sends/receives messages, covering the following topics: &lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;How to setup a basic Python dev environment on a Windows machine.&lt;/li&gt;
+&lt;li&gt;How to create an application representing a bot that connects to the API and exposes methods to authenticate, retrieve and send messages.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;What we will not cover here is:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Setup of your MindLink API infrastructure.&lt;/li&gt;
+&lt;li&gt;Provisioning of user, agents and channels.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;You probably have noticed by now that the assumption is that you have some degree of familiarity with the fundamental concepts of the API - for more information please do visit our &lt;a href=&quot;https://wiki.mindlinksoft.com/tiki-index.php?page=MindLink+API#API_Developers_reference&quot;&gt;comprehensive developer reference wiki&lt;/a&gt;, and of some fundamental programming concepts. &lt;/p&gt;
+&lt;p&gt;Also, in case it wasn’t clear enough from the blob above, &lt;strong&gt;I am no python expert&lt;/strong&gt; - so if you notice anything wrong or that could be done better please do feel free to leave a comment!&lt;/p&gt;
+&lt;p&gt;By the way, you can find the code we’re writing here and more &lt;a href=&quot;https://github.com/mindlink/api-samples/tree/master/python-sample&quot;&gt;at our github&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Now, without any further ado:&lt;/p&gt;
+&lt;h2&gt;1 Set up your dev environment&lt;/h2&gt;
+&lt;p&gt;For briefness, the assumption is that we will configure our environment on a Windows machine. Using Linux or OSX will not be too dissimilar.&lt;/p&gt;
+&lt;h3&gt;1.1 Install Python&lt;/h3&gt;
+&lt;p&gt;First thing is to have a local installation of Python. Go to &lt;a href=&quot;https://www.python.org/downloads/&quot;&gt;https://www.python.org/downloads/&lt;/a&gt;, and download the latest stable version (3.6.5 at the time of writing).  Run the installer, and make sure you tick the “add to PATH” option. This will ensure that you can run the Python interpreter, pip, etc. from any folder.&lt;/p&gt;
+&lt;h3&gt;1.2 Install your IDE of choice&lt;/h3&gt;
+&lt;p&gt;While IDEs are like pizza toppings, everyone has their favourites and they are all great (except for pineapple), I have chosen to use &lt;a href=&quot;https://code.visualstudio.com/&quot;&gt;Visual Studio Code&lt;/a&gt;. It’s what we use for our client side TS/React development, it’s a great editor and a fantastic project. Simply download and run the installer.&lt;/p&gt;
+&lt;h4&gt;1.2.1 Install the Python extension for VS Code&lt;/h4&gt;
+&lt;p&gt;This will allow us to run the debugger from VS Code, set breakpoints, leverage autocompletion and more. Simply launch VS Code, go to the extensions tab (Ctrl-Shift-X) and search for Pyhon, find the ms-python.python extension and install it. Restart VS Code to make the extension load.&lt;/p&gt;
+&lt;h3&gt;1.3 Install Python Requests library&lt;/h3&gt;
+&lt;p&gt;As I am sure you know, MLAPI is a REST api, meaning requests are made using HTTP. While Python has standard libraries that allow for HTTP handling, &lt;a href=&quot;http://docs.python-requests.org/en/master/&quot;&gt;requests&lt;/a&gt; is easy to use, widespread, comes highly recommended and is, according to them,“is the only Non-GMO HTTP library for Python, safe for human consumption.”, whatever that means.&lt;/p&gt;
+&lt;p&gt;To install requests, simply run “pip install requests” in a cmd/powershell or VSCode terminal window.&lt;/p&gt;
+&lt;p&gt;We’re now ready to code!&lt;/p&gt;
+&lt;h2&gt;2 Get your details!&lt;/h2&gt;
+&lt;p&gt;Before we start writing code we need to know few details about the MindLink API deployment that we’re going to use.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;The API location URL, i.e. &lt;a href=&quot;http://mlapi.company.com:X&quot;&gt;http://mlapi.company.com:X&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;The agent ID for the agent that we will use.&lt;/li&gt;
+&lt;li&gt;The username and password for the user backing the agent.&lt;/li&gt;
+&lt;li&gt;The ID of a channel(s) that the agent is provisioned upon.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Again, if you are unsure of what any of those terms mean please do refer to our wiki.&lt;/p&gt;
+&lt;p&gt;We finally start writing some code! Find some place where you’ll write your files to, open your IDE, create a new file and off we go!&lt;/p&gt;
+&lt;h2&gt;3 Getting a token&lt;/h2&gt;
+&lt;p&gt;First thing we have to do is to get a token. This is done by performing a post request onto the authentication service, specifically on the Authentication/V1/Tokens resource providing agent ID, username and password as payload. In our file, let’s define a function “authenticate” that takes in the URL of the service, agent ID, username, password and returns us the token.
+The function will:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Build the URL of the service &lt;/li&gt;
+&lt;li&gt;Post the request to the service endpoint, with the necessary payload.
+As a final note, to make the result easier to handle we will specify via headers that we want the MLAPI server to return us JSON. This will make data very easy to deserialize, as the requests library has in build support for JSON.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&quot;gatsby-highlight&quot;&gt;
+      &lt;pre class=&quot;language-python&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;&lt;span class=&quot;token keyword&quot;&gt;import&lt;/span&gt; requests
+
+&lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;authenticate&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;self&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; host&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; username&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; password&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; agent&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+    request_url &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&apos;{}/Authentication/V1/Tokens&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token builtin&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;host&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+
+    response &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; requests&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;post&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;request_url&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; json &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;token string&quot;&gt;&apos;Username&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; username&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+                &lt;span class=&quot;token string&quot;&gt;&apos;Password&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; password&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+                &lt;span class=&quot;token string&quot;&gt;&apos;AgentId&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; agent
+    &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; headers &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token string&quot;&gt;&apos;Accept&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&apos;application/json&apos;&lt;/span&gt;
+    &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+
+    &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; response&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;json&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+      &lt;/div&gt;
+&lt;p&gt;Let’s analyse what is going on in this code block.
+The first line imports the requests library that we’ve previously installed on our environment, allowing us to use it in the scope of this file.&lt;/p&gt;
+&lt;p&gt;We then define a function that takes in the aforementioned parameters.
+The first line of the function builds the full URL of our request by appending the static part of the request address (the “/Authentication/V1/Tokens” bit) to the dynamic part (the provided protocol/server/port). &lt;/p&gt;
+&lt;p&gt;We then create and forward a post request. The first parameter is the URL we just created, and then we provide the request payload which is automatically serialized in JSON by the requests library - all we have to do is to match the attributes to the parameters.&lt;/p&gt;
+&lt;p&gt;The next parameter for our requests is the headers. We specify that we want to accept JSON, to make deserialization of the result very easy.&lt;/p&gt;
+&lt;p&gt;Do note that the request is immediately fired once the .post method is called, hence why we assign its result to the “response” parameter.&lt;/p&gt;
+&lt;p&gt;Provided that the request was completed succesfully, our response will contain a JSON-encoded MLAPI token. To “extract” it, we simply use the .json() method onto the response object.&lt;/p&gt;
+&lt;p&gt;OK, how do we actually use what we just wrote though? Below the previous code block, let’s add:&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot;&gt;
+      &lt;pre class=&quot;language-python&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;token &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; authenticate&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&apos;http://apiserver.domain.com:8081&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&apos;userdomain\\username&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&apos;password&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&apos;agentId&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;token keyword&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&apos;Here`s my token!&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; token&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+      &lt;/div&gt;
+&lt;p&gt;We can now run our program. 2 ways of doing this, either &lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;open a cmd/powershell/terminal instance in the folder where our file resides and run python my_file.py&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;
+  &lt;a
+    class=&quot;gatsby-resp-image-link&quot;
+    href=&quot;/static/cmd_run_py-d4ae5f47947f8767601cce6b7a7e15e4-87d31.png&quot;
+    style=&quot;display: block&quot;
+    target=&quot;_blank&quot;
+    rel=&quot;noopener&quot;
+  &gt;
+  
+  &lt;span
+    class=&quot;gatsby-resp-image-wrapper&quot;
+    style=&quot;position: relative; display: block; ; max-width: 590px; margin-left: auto; margin-right: auto;&quot;
+  &gt;
+    &lt;span
+      class=&quot;gatsby-resp-image-background-image&quot;
+      style=&quot;padding-bottom: 59.241706161137444%; position: relative; bottom: 0; left: 0; background-image: url(&apos;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAMCAYAAABiDJ37AAAACXBIWXMAAA7DAAAOwwHHb6hkAAABCElEQVQoz+2STU7DMBCFHTt2FMEmBFdqkoKRIA03QJSGLsslOQASG35aICSBtlFaLvWwvYEFiAq6ZPFp3nispyfNkMura9xOJ7iZ3uOxLDBvGyxWLWa6Gt28LTFftlpXaFa11WZevtYoXioUdYmn6hl3DxMUsxrkMEsRdyMopbDX60HtK/TTvu0PNFl2jPQoRRJLRN0dxFGidYKOlAjDEEEQQO5KcJdjfDEGEVs+GGNgrgtKKTjnEELYat5t7wkQQn7kdHgGQoW71meD4zhfYsKYeT46B2EeX9vwOyijtg5HuU7ouf+GfzbcxFLYJ0OxgYQO/Tgbvu2Dcn3UOqkx/w3c96zhST7AO2mBLFiZfgKrAAAAAElFTkSuQmCC&apos;); background-size: cover; display: block;&quot;
+    &gt;
+      &lt;img
+        class=&quot;gatsby-resp-image-image&quot;
+        style=&quot;width: 100%; height: 100%; margin: 0; vertical-align: middle; position: absolute; top: 0; left: 0; box-shadow: inset 0px 0px 0px 400px white;&quot;
+        alt=&quot;Running Python via PS&quot;
+        title=&quot;&quot;
+        src=&quot;/static/cmd_run_py-d4ae5f47947f8767601cce6b7a7e15e4-fb8a0.png&quot;
+        srcset=&quot;/static/cmd_run_py-d4ae5f47947f8767601cce6b7a7e15e4-1a291.png 148w,
+/static/cmd_run_py-d4ae5f47947f8767601cce6b7a7e15e4-2bc4a.png 295w,
+/static/cmd_run_py-d4ae5f47947f8767601cce6b7a7e15e4-fb8a0.png 590w,
+/static/cmd_run_py-d4ae5f47947f8767601cce6b7a7e15e4-87d31.png 844w&quot;
+        sizes=&quot;(max-width: 590px) 100vw, 590px&quot;
+      /&gt;
+    &lt;/span&gt;
+  &lt;/span&gt;
+  
+  &lt;/a&gt;
+    &lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;or by leveraging the Python running and debugging capabilities of our IDE. In VSCode simply go to the debug menu and press “Start (Without) Debugging”. A dropdown menu to choose the running environment will open, and you can safely choose “Python”. In the terminal tab you’ll see the command VSCode actually runs, and hopefully our output.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;
+  &lt;a
+    class=&quot;gatsby-resp-image-link&quot;
+    href=&quot;/static/vscode_run-d1de836a4ba530d11766017a22e6c694-ef9ea.png&quot;
+    style=&quot;display: block&quot;
+    target=&quot;_blank&quot;
+    rel=&quot;noopener&quot;
+  &gt;
+  
+  &lt;span
+    class=&quot;gatsby-resp-image-wrapper&quot;
+    style=&quot;position: relative; display: block; ; max-width: 590px; margin-left: auto; margin-right: auto;&quot;
+  &gt;
+    &lt;span
+      class=&quot;gatsby-resp-image-background-image&quot;
+      style=&quot;padding-bottom: 54.270833333333336%; position: relative; bottom: 0; left: 0; background-image: url(&apos;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAALCAYAAAB/Ca1DAAAACXBIWXMAAA7DAAAOwwHHb6hkAAABZUlEQVQoz52RaW7CQAyFcwIQEoVss2WZLISGXf1X0t6g96FQEUpv/eoMYpWq0v745IznPXvsWOvtJ9brDVard2w2H6h3O2y3taGu76PR7si333/BkqFGr9cHZwzc8+C7LrrdLlqt1p9ot9vodDqwZvMFlJIo8xSz8hFaazqrf2PleQYhJOI4hpISgjOCX8EJRhP8RqOjgjnCMERKL0viCFGgEFDhS6QQRnwPVpZl8H3f7JAxDv+n7hewm29G/qPOFGwSx/GkoPH4GdNZ3GBywtxL2ltAE8pmXYRVPJbQ5QT5dIFi/oTBeAKVDYgCKh9CJNQwicF0ciBNwMPmTJPFKaKiRDqaGo/UKe2wGCKINXSWGyIyKeqogtBEIRW9RBygn3eIZ3yzJn7SWGkcwus/wHf68O0eGEXu2td4DmFf4FzknBOMtFZWvUFMniHnr5CzFzjjCv3REvYdNDp3vISYVeDTyvi/AcmcRkOwkYvvAAAAAElFTkSuQmCC&apos;); background-size: cover; display: block;&quot;
+    &gt;
+      &lt;img
+        class=&quot;gatsby-resp-image-image&quot;
+        style=&quot;width: 100%; height: 100%; margin: 0; vertical-align: middle; position: absolute; top: 0; left: 0; box-shadow: inset 0px 0px 0px 400px white;&quot;
+        alt=&quot;VSCode debugger&quot;
+        title=&quot;&quot;
+        src=&quot;/static/vscode_run-d1de836a4ba530d11766017a22e6c694-fb8a0.png&quot;
+        srcset=&quot;/static/vscode_run-d1de836a4ba530d11766017a22e6c694-1a291.png 148w,
+/static/vscode_run-d1de836a4ba530d11766017a22e6c694-2bc4a.png 295w,
+/static/vscode_run-d1de836a4ba530d11766017a22e6c694-fb8a0.png 590w,
+/static/vscode_run-d1de836a4ba530d11766017a22e6c694-526de.png 885w,
+/static/vscode_run-d1de836a4ba530d11766017a22e6c694-fa2eb.png 1180w,
+/static/vscode_run-d1de836a4ba530d11766017a22e6c694-08f6a.png 1770w,
+/static/vscode_run-d1de836a4ba530d11766017a22e6c694-ef9ea.png 1920w&quot;
+        sizes=&quot;(max-width: 590px) 100vw, 590px&quot;
+      /&gt;
+    &lt;/span&gt;
+  &lt;/span&gt;
+  
+  &lt;/a&gt;
+    &lt;/p&gt;
+&lt;h3&gt;3.1 Let’s handle some errors&lt;/h3&gt;
+&lt;p&gt;One of the problems with the code we just wrote, is that it deals poorly with errors. It always tries to deserialize the response, which can fail horribly if the request was not successful. So let’s add some error handling/reporting.&lt;/p&gt;
+&lt;p&gt;Instead of just returning the response.json(), we can add a conditional statement that will try to deserialize and return the token &lt;strong&gt;only&lt;/strong&gt; if the server has given us a 200 response code (OK). We can also take this a step further by making the function print to console the status code and reason of an erroneous response. The second part of our function will now look like:&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot;&gt;
+      &lt;pre class=&quot;language-python&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;    &lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; response&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;status_code &lt;span class=&quot;token operator&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;200&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; response&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;json&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+
+    &lt;span class=&quot;token keyword&quot;&gt;print&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&apos;Something went wrong!&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; response&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;status_code&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; response&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;reason&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+      &lt;/div&gt;
+&lt;p&gt;If we now run our program, the output will look a lot less scary and more useful, even when something goes wrong!&lt;/p&gt;
+&lt;p&gt;
+  &lt;a
+    class=&quot;gatsby-resp-image-link&quot;
+    href=&quot;/static/auth_with_error_handling-aa594c2505e2e5f0214d436046820a10-59922.png&quot;
+    style=&quot;display: block&quot;
+    target=&quot;_blank&quot;
+    rel=&quot;noopener&quot;
+  &gt;
+  
+  &lt;span
+    class=&quot;gatsby-resp-image-wrapper&quot;
+    style=&quot;position: relative; display: block; ; max-width: 590px; margin-left: auto; margin-right: auto;&quot;
+  &gt;
+    &lt;span
+      class=&quot;gatsby-resp-image-background-image&quot;
+      style=&quot;padding-bottom: 54.06673618352451%; position: relative; bottom: 0; left: 0; background-image: url(&apos;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAALCAYAAAB/Ca1DAAAACXBIWXMAAA7DAAAOwwHHb6hkAAABbklEQVQoz5WRWU7DQBBE5wZEQnFMmNXr2IlDWBI4ABJwAk6SxPmAqxc1kxiExPrxVO5Rd/Vi0e/32PV7bDYbbLdb7BkH+r7/M7tdH2teX14hXFFhkqawRsNqBS0lkiTBaDTCycko6m8MeePxGOJmtYK1FovW42rRoSzLGDvn/kWoybIMYtY0MAy8b1AWBYwx0JpQldZQSkV0+Cb6G0JOqBUNDfMsR+trNFWBuixQHcnZObOG5zA/mg2GQWnYHsZ1AccuQxI7Uj/iI2pQFXMOG8j3TUTjPeT5OYsPBtZ8MYFhcXh/J5zEQlGty5DlPFUYhoOJbnmJ9nqN+eqO3MIvr6D8HKrpoNoFoc5njFvoqqLW0DxRQNIs5+2b7gJZVcPRWMy6BUrfRnI+2qKEsu4zZoBT6cDxhxHJNaUMK+uI8IXDNDmFSscRfZbATCf/Qk9TMoEior5/hlo/QN89RdKbByTXfyfkq9tHyPUjDOvfAGDsRPDvOeTQAAAAAElFTkSuQmCC&apos;); background-size: cover; display: block;&quot;
+    &gt;
+      &lt;img
+        class=&quot;gatsby-resp-image-image&quot;
+        style=&quot;width: 100%; height: 100%; margin: 0; vertical-align: middle; position: absolute; top: 0; left: 0; box-shadow: inset 0px 0px 0px 400px white;&quot;
+        alt=&quot;With some error handling&quot;
+        title=&quot;&quot;
+        src=&quot;/static/auth_with_error_handling-aa594c2505e2e5f0214d436046820a10-fb8a0.png&quot;
+        srcset=&quot;/static/auth_with_error_handling-aa594c2505e2e5f0214d436046820a10-1a291.png 148w,
+/static/auth_with_error_handling-aa594c2505e2e5f0214d436046820a10-2bc4a.png 295w,
+/static/auth_with_error_handling-aa594c2505e2e5f0214d436046820a10-fb8a0.png 590w,
+/static/auth_with_error_handling-aa594c2505e2e5f0214d436046820a10-526de.png 885w,
+/static/auth_with_error_handling-aa594c2505e2e5f0214d436046820a10-fa2eb.png 1180w,
+/static/auth_with_error_handling-aa594c2505e2e5f0214d436046820a10-08f6a.png 1770w,
+/static/auth_with_error_handling-aa594c2505e2e5f0214d436046820a10-59922.png 1918w&quot;
+        sizes=&quot;(max-width: 590px) 100vw, 590px&quot;
+      /&gt;
+    &lt;/span&gt;
+  &lt;/span&gt;
+  
+  &lt;/a&gt;
+    &lt;/p&gt;
+&lt;p&gt;We can clearly see that the issue is that my credentials are wrong.&lt;/p&gt;
+&lt;h2&gt;4 Getting messages&lt;/h2&gt;
+&lt;p&gt;Now that we have a token, we can use it to start actually doing collaboration!
+Let’s write a function that will retrieve the last X messages from a channel.&lt;/p&gt;
+&lt;p&gt;In our existing file:&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot;&gt;
+      &lt;pre class=&quot;language-python&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;&lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;get_messages&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;host&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; token&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; channel_id&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; count&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+    request_url &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&apos;{}/Collaboration/V1/Channels/{}/Messages&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token builtin&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;host&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; channel_id&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+
+    response &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; requests&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;get&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;
+        request_url&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+        params &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token string&quot;&gt;&apos;take&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; count&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+        headers &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;token string&quot;&gt;&apos;Accept&apos;&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&apos;application/json&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+            &lt;span class=&quot;token string&quot;&gt;&apos;Authorization&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&apos;FCF {}&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token builtin&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;token&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+
+    &lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; response&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;status_code &lt;span class=&quot;token operator&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;200&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; response&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;json&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+
+    &lt;span class=&quot;token keyword&quot;&gt;print&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&apos;Something went wrong!&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; response&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;status_code&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; response&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;reason&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+      &lt;/div&gt;
+&lt;p&gt;As you can see, the method is quite similar to the “authenticate” one that we wrote previously.&lt;/p&gt;
+&lt;p&gt;Notable differences are:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;The request URL, we now want to access the &lt;a href=&quot;https://wiki.mindlinksoft.com/tiki-index.php?page=MindLink+API#Collaboration_REST_API&quot;&gt;Collaboration service&lt;/a&gt;, and in it the &lt;a href=&quot;https://wiki.mindlinksoft.com/tiki-index.php?page=MindLink+API#Channels_id_Messages_resource&quot;&gt;Messages resource of a specific channel&lt;/a&gt;, identified by its ID.&lt;/li&gt;
+&lt;li&gt;We are using a GET request, not a POST.&lt;/li&gt;
+&lt;li&gt;We have to specify a “take” parameter with the number of messages that we want to retrieve.&lt;/li&gt;
+&lt;li&gt;We have to provide the token as our authorization header.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Let’s update our code to use the new function. As we have to reuse the host, username, password and agent id values, we can store them in variables, i.e.:&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot;&gt;
+      &lt;pre class=&quot;language-python&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;host &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&apos;http://localhost:8081&apos;&lt;/span&gt;
+user_name &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&apos;domain\\user&apos;&lt;/span&gt;
+password &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&apos;super_secret_password&apos;&lt;/span&gt;
+agent &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&apos;agent_1&apos;&lt;/span&gt;
+
+token &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; authenticate&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;host&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; user_name&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; password&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; agent&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;token keyword&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&apos;Here`s my token!&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; token&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+
+messages &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; get_messages&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;host&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; token&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&apos;chat-room:d343ec64-c867-4edf-9daf-84f25a3c8ed4&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;token keyword&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&apos;here are my messages!&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; messages&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+      &lt;/div&gt;
+&lt;p&gt;If we now run the program, the output should look something like:&lt;/p&gt;
+&lt;p&gt;
+  &lt;a
+    class=&quot;gatsby-resp-image-link&quot;
+    href=&quot;/static/get_messages-8a8a4ce52af32aa104e553b1759e93bd-2c446.png&quot;
+    style=&quot;display: block&quot;
+    target=&quot;_blank&quot;
+    rel=&quot;noopener&quot;
+  &gt;
+  
+  &lt;span
+    class=&quot;gatsby-resp-image-wrapper&quot;
+    style=&quot;position: relative; display: block; ; max-width: 590px; margin-left: auto; margin-right: auto;&quot;
+  &gt;
+    &lt;span
+      class=&quot;gatsby-resp-image-background-image&quot;
+      style=&quot;padding-bottom: 55.67542213883677%; position: relative; bottom: 0; left: 0; background-image: url(&apos;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAALCAYAAAB/Ca1DAAAACXBIWXMAAA7DAAAOwwHHb6hkAAABL0lEQVQoz42SWXLDIAyGuUfYMZsTUjtO0mnvf6+/Eo4zaaed+uFDSAihBWGtQy0Vp1oQhwHBe4QQYIyBUupftNZdeu/6XeFoaa2hpIhIgQIfkHTOPS/shZMQxlqMJSNSIO9sP5BSfnt9b5ZrQFpSTKg5UUDXjczmtDe7zVfElHBpR7QcweV7gsvtTjv4GVjwILjkQhkO3DvLw5DQ/OIOetlbiwgRhohEWZZCUybJPVWMYQwkPSAfsutkZ53PpTZwdD+PR1jnO+J8WXD7+Oxc7u9o1zvOt3ecSJZpRpknVJJ1Ic60nxeM8xWpTchvZJsWZLInCprqCDFQyZky4yxjjH0wK5bKX+k6/ddXvcuHrrV6DlPwF5GHw4o8rP3YUA/kL6hXH/X0FcoF7Mb+YXvhC80CMFSZfTQKAAAAAElFTkSuQmCC&apos;); background-size: cover; display: block;&quot;
+    &gt;
+      &lt;img
+        class=&quot;gatsby-resp-image-image&quot;
+        style=&quot;width: 100%; height: 100%; margin: 0; vertical-align: middle; position: absolute; top: 0; left: 0; box-shadow: inset 0px 0px 0px 400px white;&quot;
+        alt=&quot;Get messages result&quot;
+        title=&quot;&quot;
+        src=&quot;/static/get_messages-8a8a4ce52af32aa104e553b1759e93bd-fb8a0.png&quot;
+        srcset=&quot;/static/get_messages-8a8a4ce52af32aa104e553b1759e93bd-1a291.png 148w,
+/static/get_messages-8a8a4ce52af32aa104e553b1759e93bd-2bc4a.png 295w,
+/static/get_messages-8a8a4ce52af32aa104e553b1759e93bd-fb8a0.png 590w,
+/static/get_messages-8a8a4ce52af32aa104e553b1759e93bd-526de.png 885w,
+/static/get_messages-8a8a4ce52af32aa104e553b1759e93bd-fa2eb.png 1180w,
+/static/get_messages-8a8a4ce52af32aa104e553b1759e93bd-08f6a.png 1770w,
+/static/get_messages-8a8a4ce52af32aa104e553b1759e93bd-2c446.png 2132w&quot;
+        sizes=&quot;(max-width: 590px) 100vw, 590px&quot;
+      /&gt;
+    &lt;/span&gt;
+  &lt;/span&gt;
+  
+  &lt;/a&gt;
+    &lt;/p&gt;
+&lt;p&gt;This looks perhaps a bit confusing…let’s have a look at those messages using the debugger. Let’s set a breakpoint on the line where we print the messages, launch the application and inspect the “messages” object.&lt;/p&gt;
+&lt;p&gt;
+  &lt;a
+    class=&quot;gatsby-resp-image-link&quot;
+    href=&quot;/static/messages-59cfc6a26e7ba1545eef50766ecd0432-e19cf.png&quot;
+    style=&quot;display: block&quot;
+    target=&quot;_blank&quot;
+    rel=&quot;noopener&quot;
+  &gt;
+  
+  &lt;span
+    class=&quot;gatsby-resp-image-wrapper&quot;
+    style=&quot;position: relative; display: block; ; max-width: 590px; margin-left: auto; margin-right: auto;&quot;
+  &gt;
+    &lt;span
+      class=&quot;gatsby-resp-image-background-image&quot;
+      style=&quot;padding-bottom: 67.17373899119295%; position: relative; bottom: 0; left: 0; background-image: url(&apos;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAANCAYAAACpUE5eAAAACXBIWXMAAA7EAAAOxAGVKw4bAAABiklEQVQ4y42T6W6jMBSFeY02eAMvGDBL2BKkGc38Gc37v9DptZNWUduk+fHpWl4OdzlkQgjYyiOEgLqq0NUera/QVA62LKALQhtCoygUGGN3yfMcmSTBkh6O44imrlGoyyNOCM4Rz6WUifjxdEb798jeL3Ztg8raJKIkiZAwvwrcEh89yvIqKGF1idpoeEPRalgSV0p9K/ZzhlJRHxu0bQvvPRT1LWYnbsp9RuxD0DmH2hl0TqOhDGMf4xB0qVM0xiTRpwQLyuY4HWm6VZpooS49FdcLcXJ5frgRYw/JYp8M2cISJmYVo7FwZCFrXRrOZUASh0O0Bn9IFr0VgkfXGIxdhdA6zNOK/fQb87zitJ2xbTvGYSAXkMU0Jz+yu2S6jIIafZAYgkJHcTrO+LP+xTKdMPYjpmFC35Pxa5bwnn2sP5NxLqiUPJUTeXk9INQD/u3/sa871mnGeVnJpz1enylZiPdG86s1crRNj335hW3ZsJ/PJLrQXgDjPw8m+/I73azZJ+IDxh7b5g2lJmuCfA67TwAAAABJRU5ErkJggg==&apos;); background-size: cover; display: block;&quot;
+    &gt;
+      &lt;img
+        class=&quot;gatsby-resp-image-image&quot;
+        style=&quot;width: 100%; height: 100%; margin: 0; vertical-align: middle; position: absolute; top: 0; left: 0; box-shadow: inset 0px 0px 0px 400px white;&quot;
+        alt=&quot;Messages&quot;
+        title=&quot;&quot;
+        src=&quot;/static/messages-59cfc6a26e7ba1545eef50766ecd0432-fb8a0.png&quot;
+        srcset=&quot;/static/messages-59cfc6a26e7ba1545eef50766ecd0432-1a291.png 148w,
+/static/messages-59cfc6a26e7ba1545eef50766ecd0432-2bc4a.png 295w,
+/static/messages-59cfc6a26e7ba1545eef50766ecd0432-fb8a0.png 590w,
+/static/messages-59cfc6a26e7ba1545eef50766ecd0432-526de.png 885w,
+/static/messages-59cfc6a26e7ba1545eef50766ecd0432-fa2eb.png 1180w,
+/static/messages-59cfc6a26e7ba1545eef50766ecd0432-e19cf.png 1249w&quot;
+        sizes=&quot;(max-width: 590px) 100vw, 590px&quot;
+      /&gt;
+    &lt;/span&gt;
+  &lt;/span&gt;
+  
+  &lt;/a&gt;
+    &lt;/p&gt;
+&lt;p&gt;Now it makes a bit more sense. We have an array with 2 messages, and if we expand the first node we can see all the properties of each message object. We can use what we have just learned to prettify the output of our application. We’ll iterate through each message and print some properties. Simply replace the line printing messages for:&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot;&gt;
+      &lt;pre class=&quot;language-python&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;&lt;span class=&quot;token keyword&quot;&gt;for&lt;/span&gt; message &lt;span class=&quot;token keyword&quot;&gt;in&lt;/span&gt; messages&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;token keyword&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&apos;message ID: &apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; message&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&apos;Id&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&apos; Alert? &apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; message&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&apos;IsAlert&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&apos; Sender &apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; message&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&apos;SenderId&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&apos; Text &apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; message&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&apos;Text&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+      &lt;/div&gt;
+&lt;p&gt;Notice how we’re displaying the text instead of using the message parts. Message parts are a very powerful modelling tool that remove the coupling between what a part of a message looks like and what it represents. They are a more advanced topic though, and we’ll come back to them in another episode.&lt;/p&gt;
+&lt;h2&gt;5 Sending messages&lt;/h2&gt;
+&lt;p&gt;We are now ready to send our first message! To do that:&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot;&gt;
+      &lt;pre class=&quot;language-python&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;&lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;send_message&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;host&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; token&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; channel_id&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; content&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; is_alert&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+    request_url &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&apos;{}/Collaboration/V1/Channels/{}/Messages&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token builtin&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;host&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; channel_id&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+
+    response &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; requests&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;post&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;
+        request_url&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+        json &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;token string&quot;&gt;&apos;Text&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; content&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+            &lt;span class=&quot;token string&quot;&gt;&apos;IsAlert&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; is_alert
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+        headers &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;token string&quot;&gt;&apos;Accept&apos;&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&apos;application/json&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+            &lt;span class=&quot;token string&quot;&gt;&apos;Authorization&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&apos;FCF {}&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token builtin&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;token&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+
+    &lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; response&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;status_code &lt;span class=&quot;token operator&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;200&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;token keyword&quot;&gt;print&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&apos;Something went wrong!&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; response&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;status_code&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; response&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;reason&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+      &lt;/div&gt;
+&lt;p&gt;The method is pretty self explanatory; do note how we use a POST request. As you have probably noticed, the method doesn’t look too different from the previous ones! You can probably see a pattern beginning to take shape.&lt;/p&gt;
+&lt;p&gt;Let’s call him from our bot by simply moving chatroom ID to a variable to the previous block and then adding a call to the method:&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot;&gt;
+      &lt;pre class=&quot;language-python&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;&lt;span class=&quot;token comment&quot;&gt;# snip&lt;/span&gt;
+agent &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&apos;agent_1&apos;&lt;/span&gt;
+chat &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&apos;chat-room:d343ec64-c867-4edf-9daf-84f25a3c8ed4&apos;&lt;/span&gt;
+&lt;span class=&quot;token comment&quot;&gt;# snip&lt;/span&gt;
+
+&lt;span class=&quot;token keyword&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&apos;sending a message&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+send_message&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;host&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; token&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; chat&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&quot;hello world&quot;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token boolean&quot;&gt;True&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;token comment&quot;&gt;#True for alerts, False for regular messages&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+      &lt;/div&gt;
+&lt;p&gt;That easy!&lt;/p&gt;
+&lt;h2&gt;6 Getting events&lt;/h2&gt;
+&lt;p&gt;The final piece of this initial puzzle is how to get events. Events are the mechanism that the MindLink API uses to relay in real time what is happening on channels. Again, for more information &lt;a href=&quot;https://wiki.mindlinksoft.com/tiki-index.php?page=MindLink+API#Events_resource&quot;&gt;check the dedicated section on the Wiki&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The method to get message events looks something like:&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot;&gt;
+      &lt;pre class=&quot;language-python&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;&lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;get_events&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;host&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; token&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; channel_id&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; last_event_id&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+    request_url &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&apos;{}/Collaboration/V1/Events&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token builtin&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;host&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+
+    parameters &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;token string&quot;&gt;&apos;last-event&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; last_event_id&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;token string&quot;&gt;&apos;types&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&apos;message&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;token string&quot;&gt;&apos;channels&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;channel_id&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;token string&quot;&gt;&apos;regex&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&apos;&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;token string&quot;&gt;&apos;origins&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&apos;remote&apos;&lt;/span&gt;
+    &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;
+
+    response &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; requests&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;get&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;
+        request_url&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+        params &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; parameters&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+        headers &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;token string&quot;&gt;&apos;Accept&apos;&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&apos;application/json&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt;
+            &lt;span class=&quot;token string&quot;&gt;&apos;Authorization&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&apos;FCF {}&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;token builtin&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;token&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;token punctuation&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+
+    &lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; response&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;status_code &lt;span class=&quot;token operator&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;200&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;token keyword&quot;&gt;print&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&apos;Something went wrong while getting events!&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; response&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;status_code&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; response&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;reason&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt;
+
+    &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; response&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;json&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+      &lt;/div&gt;
+&lt;p&gt;Note how we need to keep track of the last event ID - that can be extracted by simply iterating through the events and comparing their id; this could be done in the get_events function our outside of it. A function to do that could look like:&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot;&gt;
+      &lt;pre class=&quot;language-python&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;&lt;span class=&quot;token keyword&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;token function&quot;&gt;get_latest_event_id&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;events&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+
+    last_event_id &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token operator&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;token number&quot;&gt;1&lt;/span&gt;
+
+    &lt;span class=&quot;token keyword&quot;&gt;for&lt;/span&gt; event &lt;span class=&quot;token keyword&quot;&gt;in&lt;/span&gt; events&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+        event_id &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; event&lt;span class=&quot;token punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&apos;EventId&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;]&lt;/span&gt;
+
+        &lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; event_id &lt;span class=&quot;token operator&quot;&gt;&gt;&lt;/span&gt; last_event_id&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
+            last_event_id &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; event_id        
+    
+    &lt;span class=&quot;token keyword&quot;&gt;return&lt;/span&gt; last_event_id&lt;/code&gt;&lt;/pre&gt;
+      &lt;/div&gt;
+&lt;p&gt;While events can be retrieved individually, the streaming paradigm implies that what we probably want to do is to continuously ask for new requests, i.e. poll. To do that we would need few things:
+- keep track of the last event ID, so we only ask for newer events
+- introduce a loop with control
+- run this event pump in a separate thread, or use asynchronous requests, so that it does not block our bot.
+To see a sample of that, everything we discussed here and much much more, do check out our sample &lt;a href=&quot;https://github.com/mindlink/api-samples/tree/master/python-sample/sample2&quot;&gt;on our github&lt;/a&gt;.
+The sample introduces a second module that contains all the various API methods that we have seen here in an instantiable class, so that we reduce duplication (no need to provide host and token for each request) and our application logic is less coupled with the API.&lt;/p&gt;
+&lt;h2&gt;7 Wrapping up&lt;/h2&gt;
+&lt;p&gt;Hopefully if you have made it this far you’ll have realised how simple it is to write collaborative tools using the MindLink API, even when starting anew with a programming language as we did here. Naturally we have just begun to scratch the surface of the capabilities of the platform, so stay tuned for more!&lt;/p&gt;</content:encoded></item><item><title><![CDATA[Parallelizing our CI tests]]></title><description><![CDATA[In this second “improving our CI tests” blog we’ll complete our journey by: Enabling parallel NUnit test execution at the text-fixture…]]></description><link>https://engineering.mindlinksoft.comparallelizing-our-ci-tests</link><guid isPermaLink="false">https://engineering.mindlinksoft.comparallelizing-our-ci-tests</guid><pubDate>Thu, 05 Jul 2018 13:10:00 GMT</pubDate><content:encoded>&lt;p&gt;In this second “improving our CI tests” blog we’ll complete our journey by:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;Enabling parallel NUnit test execution at the text-fixture granularity&lt;/li&gt;
 &lt;li&gt;Fixing some issues in our CI tests stack that prevented parallelisation&lt;/li&gt;
