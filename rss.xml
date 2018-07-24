@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Engineering at MindLink]]></title><description><![CDATA[Insights and musings from the MindLink software engineers]]></description><link>https://engineering.mindlinksoft.com</link><generator>RSS for Node</generator><lastBuildDate>Mon, 23 Jul 2018 15:32:00 GMT</lastBuildDate><item><title><![CDATA[Getting started with Python and the MindLink API.]]></title><description><![CDATA[Today, we’ll have a look at how I started coding in Python to work with the MindLink API. Although Python is an extremely popular language…]]></description><link>https://engineering.mindlinksoft.comgetting-started-with-python-and-the-mindlink-api</link><guid isPermaLink="false">https://engineering.mindlinksoft.comgetting-started-with-python-and-the-mindlink-api</guid><pubDate>Mon, 23 Jul 2018 17:10:00 GMT</pubDate><content:encoded>&lt;p&gt;Today, we’ll have a look at how I started coding in Python to work with the MindLink API.&lt;/p&gt;
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Engineering at MindLink]]></title><description><![CDATA[Insights and musings from the MindLink software engineers]]></description><link>https://engineering.mindlinksoft.com</link><generator>RSS for Node</generator><lastBuildDate>Tue, 24 Jul 2018 11:05:07 GMT</lastBuildDate><item><title><![CDATA[Getting started with Python and the MindLink API.]]></title><description><![CDATA[Today, we’ll have a look at how I started coding in Python to work with the MindLink API. Although Python is an extremely popular language…]]></description><link>https://engineering.mindlinksoft.comgetting-started-with-python-and-the-mindlink-api</link><guid isPermaLink="false">https://engineering.mindlinksoft.comgetting-started-with-python-and-the-mindlink-api</guid><pubDate>Mon, 23 Jul 2018 17:10:00 GMT</pubDate><content:encoded>&lt;p&gt;Today, we’ll have a look at how I started coding in Python to work with the MindLink API.&lt;/p&gt;
 &lt;p&gt;Although Python is an extremely popular language, we, or at least I, haven’t used too much of it. When we started investigating the capabilities of the &lt;a href=&quot;https://rasa.com/&quot;&gt;Rasa Core platform&lt;/a&gt; as part of our &lt;a href=&quot;../leveraging-rasa-to-build-on-premise-intelligent-chat-bots&quot;&gt;larger work around intelligent chat bots&lt;/a&gt;, we found out that they have a neat open source API, in Python. The next natural step for us was wanting to leverage the capabilities of the MindLink API (MLAPI for briefness) to provide the bot with voice and ears; while there are ways to use Rasa-Core in a language-agnostic way, we took the chance to dive into a bit of Python programming, beginners level.
 This post will document how I went from virtually no Python knowledge to writing a simple bot harness that connects to the MLAPI and sends/receives messages, covering the following topics: &lt;/p&gt;
 &lt;ul&gt;
@@ -21,7 +21,7 @@ This post will document how I went from virtually no Python knowledge to writing
 &lt;h3&gt;1.2 Install your IDE of choice&lt;/h3&gt;
 &lt;p&gt;While IDEs are like pizza toppings, everyone has their favourites and they are all great (except for pineapple), I have chosen to use &lt;a href=&quot;https://code.visualstudio.com/&quot;&gt;Visual Studio Code&lt;/a&gt;. It’s what we use for our client side TS/React development, it’s a great editor and a fantastic project. Simply download and run the installer.&lt;/p&gt;
 &lt;h4&gt;1.2.1 Install the Python extension for VS Code&lt;/h4&gt;
-&lt;p&gt;This will allow us to run the debugger from VS Code, set breakpoints, leverage autocompletion and more. Simply launch VS Code, go to the extensions tab (Ctrl-Shift-X) and search for Pyhon, find the ms-python.python extension and install it. Restart VS Code to make the extension load.&lt;/p&gt;
+&lt;p&gt;This will allow us to run the debugger from VS Code, set breakpoints, leverage autocompletion and more. Simply launch VS Code, go to the extensions tab (Ctrl-Shift-X) and search for Python, find the ms-python.python extension and install it. Restart VS Code to make the extension load.&lt;/p&gt;
 &lt;h3&gt;1.3 Install Python Requests library&lt;/h3&gt;
 &lt;p&gt;As I am sure you know, MLAPI is a REST api, meaning requests are made using HTTP. While Python has standard libraries that allow for HTTP handling, &lt;a href=&quot;http://docs.python-requests.org/en/master/&quot;&gt;requests&lt;/a&gt; is easy to use, widespread, comes highly recommended and is, according to them,“is the only Non-GMO HTTP library for Python, safe for human consumption.”, whatever that means.&lt;/p&gt;
 &lt;p&gt;To install requests, simply run “pip install requests” in a cmd/powershell or VSCode terminal window.&lt;/p&gt;
@@ -35,14 +35,14 @@ This post will document how I went from virtually no Python knowledge to writing
 &lt;li&gt;The ID of a channel(s) that the agent is provisioned upon.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;Again, if you are unsure of what any of those terms mean please do refer to our wiki.&lt;/p&gt;
-&lt;p&gt;We finally start writing some code! Find some place where you’ll write your files to, open your IDE, create a new file and off we go!&lt;/p&gt;
+&lt;p&gt;We can finally start writing some code! Find some place where you’ll write your files to, open your IDE, create a new file and off we go!&lt;/p&gt;
 &lt;h2&gt;3 Getting a token&lt;/h2&gt;
-&lt;p&gt;First thing we have to do is to get a token. This is done by performing a post request onto the authentication service, specifically on the Authentication/V1/Tokens resource providing agent ID, username and password as payload. In our file, let’s define a function “authenticate” that takes in the URL of the service, agent ID, username, password and returns us the token.
+&lt;p&gt;First thing we have to do is to get a token. This is done by performing a post request onto the authentication service, specifically on the Authentication/V1/Tokens resource, providing agent ID, username and password as the request’s payload. In our file, let’s define a function “authenticate” that takes in the URL of the service, agent ID, username, password and returns us the token.
 The function will:&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;Build the URL of the service &lt;/li&gt;
+&lt;li&gt;Build the URL of the service.&lt;/li&gt;
 &lt;li&gt;Post the request to the service endpoint, with the necessary payload.
-As a final note, to make the result easier to handle we will specify via headers that we want the MLAPI server to return us JSON. This will make data very easy to deserialize, as the requests library has in build support for JSON.&lt;/li&gt;
+As a final note, to make the result easier to handle, we will specify via headers that we want the MLAPI server to return us JSON. This will make data very easy to deserialize, as the requests library has in-built support for JSON.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;div class=&quot;gatsby-highlight&quot;&gt;
       &lt;pre class=&quot;language-python&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;&lt;span class=&quot;token keyword&quot;&gt;import&lt;/span&gt; requests
@@ -63,11 +63,11 @@ As a final note, to make the result easier to handle we will specify via headers
 &lt;p&gt;Let’s analyse what is going on in this code block.
 The first line imports the requests library that we’ve previously installed on our environment, allowing us to use it in the scope of this file.&lt;/p&gt;
 &lt;p&gt;We then define a function that takes in the aforementioned parameters.
-The first line of the function builds the full URL of our request by appending the static part of the request address (the “/Authentication/V1/Tokens” bit) to the dynamic part (the provided protocol/server/port). &lt;/p&gt;
-&lt;p&gt;We then create and forward a post request. The first parameter is the URL we just created, and then we provide the request payload which is automatically serialized in JSON by the requests library - all we have to do is to match the attributes to the parameters.&lt;/p&gt;
-&lt;p&gt;The next parameter for our requests is the headers. We specify that we want to accept JSON, to make deserialization of the result very easy.&lt;/p&gt;
-&lt;p&gt;Do note that the request is immediately fired once the .post method is called, hence why we assign its result to the “response” parameter.&lt;/p&gt;
-&lt;p&gt;Provided that the request was completed succesfully, our response will contain a JSON-encoded MLAPI token. To “extract” it, we simply use the .json() method onto the response object.&lt;/p&gt;
+The function begins by building the full URL of our request by appending the static part of the request address (the “/Authentication/V1/Tokens” bit) to the dynamic part (the provided protocol/server/port). &lt;/p&gt;
+&lt;p&gt;After this, we create and forward a post request. The first parameter is the URL we just created, and then we provide the request payload which is automatically serialized in JSON by the requests library - all we have to do is to match the attributes to the parameters.&lt;/p&gt;
+&lt;p&gt;The next parameter for our requests is the headers. We specify that we want to accept JSON, which will cause the API server to JSON encode the response data.&lt;/p&gt;
+&lt;p&gt;Do note that the request is immediately fired once the .post() method is called, hence why we assign its result to the “response” parameter.&lt;/p&gt;
+&lt;p&gt;Provided that the request was completed succesfully, our response will contain a JSON-encoded API token. To “extract” it, we simply use the .json() method onto the response object.&lt;/p&gt;
 &lt;p&gt;OK, how do we actually use what we just wrote though? Below the previous code block, let’s add:&lt;/p&gt;
 &lt;div class=&quot;gatsby-highlight&quot;&gt;
       &lt;pre class=&quot;language-python&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;token &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; authenticate&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&apos;http://apiserver.domain.com:8081&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&apos;userdomain\\username&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&apos;password&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&apos;agentId&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;
@@ -199,9 +199,9 @@ The first line of the function builds the full URL of our request by appending t
   
   &lt;/a&gt;
     &lt;/p&gt;
-&lt;p&gt;We can clearly see that the issue is that my credentials are wrong.&lt;/p&gt;
+&lt;p&gt;It’s now obvious that the issue here is to do with wrong credentials.&lt;/p&gt;
 &lt;h2&gt;4 Getting messages&lt;/h2&gt;
-&lt;p&gt;Now that we have a token, we can use it to start actually doing collaboration!
+&lt;p&gt;Now that we have a token, we can use it to do actual collaboration!
 Let’s write a function that will retrieve the last X messages from a channel.&lt;/p&gt;
 &lt;p&gt;In our existing file:&lt;/p&gt;
 &lt;div class=&quot;gatsby-highlight&quot;&gt;
@@ -223,15 +223,14 @@ Let’s write a function that will retrieve the last X messages from a channel.&
 
     &lt;span class=&quot;token keyword&quot;&gt;print&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&apos;Something went wrong!&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; response&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;status_code&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; response&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;reason&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
       &lt;/div&gt;
-&lt;p&gt;As you can see, the method is quite similar to the “authenticate” one that we wrote previously.&lt;/p&gt;
-&lt;p&gt;Notable differences are:&lt;/p&gt;
+&lt;p&gt;As you can see, the method is quite similar to the “authenticate” one that we wrote previously; notable differences are:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;The request URL, we now want to access the &lt;a href=&quot;https://wiki.mindlinksoft.com/tiki-index.php?page=MindLink+API#Collaboration_REST_API&quot;&gt;Collaboration service&lt;/a&gt;, and in it the &lt;a href=&quot;https://wiki.mindlinksoft.com/tiki-index.php?page=MindLink+API#Channels_id_Messages_resource&quot;&gt;Messages resource of a specific channel&lt;/a&gt;, identified by its ID.&lt;/li&gt;
 &lt;li&gt;We are using a GET request, not a POST.&lt;/li&gt;
 &lt;li&gt;We have to specify a “take” parameter with the number of messages that we want to retrieve.&lt;/li&gt;
 &lt;li&gt;We have to provide the token as our authorization header.&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;Let’s update our code to use the new function. As we have to reuse the host, username, password and agent id values, we can store them in variables, i.e.:&lt;/p&gt;
+&lt;p&gt;We can now update our code to use the new function. As we have to reuse the host, username, password and agent id values, we can store them in variables, i.e.:&lt;/p&gt;
 &lt;div class=&quot;gatsby-highlight&quot;&gt;
       &lt;pre class=&quot;language-python&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;host &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&apos;http://localhost:8081&apos;&lt;/span&gt;
 user_name &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&apos;domain\\user&apos;&lt;/span&gt;
@@ -284,7 +283,7 @@ messages &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; get_message
   
   &lt;/a&gt;
     &lt;/p&gt;
-&lt;p&gt;This looks perhaps a bit confusing…let’s have a look at those messages using the debugger. Let’s set a breakpoint on the line where we print the messages, launch the application and inspect the “messages” object.&lt;/p&gt;
+&lt;p&gt;This looks perhaps a bit confusing…time to look at those messages using the debugger. Set a breakpoint on the line where we print the messages, launch the application and inspect the “messages” object.&lt;/p&gt;
 &lt;p&gt;
   &lt;a
     class=&quot;gatsby-resp-image-link&quot;
@@ -347,8 +346,8 @@ messages &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; get_message
     &lt;span class=&quot;token keyword&quot;&gt;if&lt;/span&gt; response&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;status_code &lt;span class=&quot;token operator&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;token number&quot;&gt;200&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;:&lt;/span&gt;
         &lt;span class=&quot;token keyword&quot;&gt;print&lt;/span&gt; &lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;token string&quot;&gt;&apos;Something went wrong!&apos;&lt;/span&gt;&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; response&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;status_code&lt;span class=&quot;token punctuation&quot;&gt;,&lt;/span&gt; response&lt;span class=&quot;token punctuation&quot;&gt;.&lt;/span&gt;reason&lt;span class=&quot;token punctuation&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
       &lt;/div&gt;
-&lt;p&gt;The method is pretty self explanatory; do note how we use a POST request. As you have probably noticed, the method doesn’t look too different from the previous ones! You can probably see a pattern beginning to take shape.&lt;/p&gt;
-&lt;p&gt;Let’s call him from our bot by simply moving chatroom ID to a variable to the previous block and then adding a call to the method:&lt;/p&gt;
+&lt;p&gt;As you have probably noticed, the method doesn’t look too different from the previous ones; in fact you can probably see a pattern beginning to take shape! Anyway, the way it works is pretty self explanatory; do however note how we use a POST request!&lt;/p&gt;
+&lt;p&gt;Now, to call him from our application we’ll move the chatroom ID to a variable to the previous block to avoid duplication, and then wel’ll add a call to the method:&lt;/p&gt;
 &lt;div class=&quot;gatsby-highlight&quot;&gt;
       &lt;pre class=&quot;language-python&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;&lt;span class=&quot;token comment&quot;&gt;# snip&lt;/span&gt;
 agent &lt;span class=&quot;token operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;token string&quot;&gt;&apos;agent_1&apos;&lt;/span&gt;
@@ -409,7 +408,7 @@ send_message&lt;span class=&quot;token punctuation&quot;&gt;(&lt;/span&gt;host&l
 To see a sample of that, everything we discussed here and much much more, do check out our sample &lt;a href=&quot;https://github.com/mindlink/api-samples/tree/master/python-sample/sample2&quot;&gt;on our github&lt;/a&gt;.
 The sample introduces a second module that contains all the various API methods that we have seen here in an instantiable class, so that we reduce duplication (no need to provide host and token for each request) and our application logic is less coupled with the API.&lt;/p&gt;
 &lt;h2&gt;7 Wrapping up&lt;/h2&gt;
-&lt;p&gt;Hopefully if you have made it this far you’ll have realised how simple it is to write collaborative tools using the MindLink API, even when starting anew with a programming language as we did here. Naturally we have just begun to scratch the surface of the capabilities of the platform, so stay tuned for more!&lt;/p&gt;</content:encoded></item><item><title><![CDATA[Parallelizing our CI tests]]></title><description><![CDATA[In this second “improving our CI tests” blog we’ll complete our journey by: Enabling parallel NUnit test execution at the text-fixture…]]></description><link>https://engineering.mindlinksoft.comparallelizing-our-ci-tests</link><guid isPermaLink="false">https://engineering.mindlinksoft.comparallelizing-our-ci-tests</guid><pubDate>Thu, 05 Jul 2018 13:10:00 GMT</pubDate><content:encoded>&lt;p&gt;In this second “improving our CI tests” blog we’ll complete our journey by:&lt;/p&gt;
+&lt;p&gt;Hopefully if you have made it this far you’ll have realised how simple it is to begin writing collaborative tools using the MindLink API, even when starting anew with a programming language as we did here. Naturally we have just begun to scratch the surface of the capabilities of the platform, so stay tuned for more!&lt;/p&gt;</content:encoded></item><item><title><![CDATA[Parallelizing our CI tests]]></title><description><![CDATA[In this second “improving our CI tests” blog we’ll complete our journey by: Enabling parallel NUnit test execution at the text-fixture…]]></description><link>https://engineering.mindlinksoft.comparallelizing-our-ci-tests</link><guid isPermaLink="false">https://engineering.mindlinksoft.comparallelizing-our-ci-tests</guid><pubDate>Thu, 05 Jul 2018 13:10:00 GMT</pubDate><content:encoded>&lt;p&gt;In this second “improving our CI tests” blog we’ll complete our journey by:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;Enabling parallel NUnit test execution at the text-fixture granularity&lt;/li&gt;
 &lt;li&gt;Fixing some issues in our CI tests stack that prevented parallelisation&lt;/li&gt;
