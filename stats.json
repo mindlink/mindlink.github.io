@@ -21,8 +21,8 @@
       "path----93acfddfa4afcd4dbca4.js.map"
     ],
     "path---getting-started-with-python-and-the-mindlink-api": [
-      "path---getting-started-with-python-and-the-mindlink-api-22823d864f47e11e5ece.js",
-      "path---getting-started-with-python-and-the-mindlink-api-22823d864f47e11e5ece.js.map"
+      "path---getting-started-with-python-and-the-mindlink-api-bf6a1d7bda7e119b0675.js",
+      "path---getting-started-with-python-and-the-mindlink-api-bf6a1d7bda7e119b0675.js.map"
     ],
     "component---node-modules-gatsby-plugin-offline-app-shell-js": [
       "component---node-modules-gatsby-plugin-offline-app-shell-js-5c4c5a0f7af9dc69d6d7.js",
@@ -41,8 +41,8 @@
       "path---why-draftjs-doesnt-work-on-android-919a9fa332b8d92d4d13.js.map"
     ],
     "path---index": [
-      "path---index-7053bfa1ba0025b4841f.js",
-      "path---index-7053bfa1ba0025b4841f.js.map"
+      "path---index-af8704a99689d6eb4fec.js",
+      "path---index-af8704a99689d6eb4fec.js.map"
     ],
     "path---custom-content-in-a-skype-for-business-conversation": [
       "path---custom-content-in-a-skype-for-business-conversation-f7bf51fb6fa1a5d44e17.js",
@@ -75,14 +75,18 @@
       "path---offline-plugin-app-shell-fallback-a0e39f21c11f6a62c5ab.js.map"
     ],
     "app": [
-      "app-763d27f3b58a4b98dab9.js",
+      "app-f59e616bda748ec13e92.js",
       "build-js-styles.css",
-      "app-763d27f3b58a4b98dab9.js.map",
+      "app-f59e616bda748ec13e92.js.map",
       "build-js-styles.css.map"
     ],
     "path---publishing-to-github-pages-from-tfs": [
       "path---publishing-to-github-pages-from-tfs-efe42a166c6643254c7b.js",
       "path---publishing-to-github-pages-from-tfs-efe42a166c6643254c7b.js.map"
+    ],
+    "path---visualising-skype-for-business-persistent-chat-data": [
+      "path---visualising-skype-for-business-persistent-chat-data-a706639711b16ba64aeb.js",
+      "path---visualising-skype-for-business-persistent-chat-data-a706639711b16ba64aeb.js.map"
     ],
     "path---404": [
       "path---404-a0e39f21c11f6a62c5ab.js",
