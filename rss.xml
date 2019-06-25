@@ -1,4 +1,116 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Engineering at MindLink]]></title><description><![CDATA[Insights and musings from the MindLink software engineers]]></description><link>https://engineering.mindlinksoft.com</link><generator>RSS for Node</generator><lastBuildDate>Tue, 25 Jun 2019 12:54:59 GMT</lastBuildDate><item><title><![CDATA[Automate your memory profiling now]]></title><description><![CDATA[MindLink’s core product is designed to be a long running and stable server brokering between clients and chat systems. Stability is…]]></description><link>https://engineering.mindlinksoft.comautomate-your-memory-profiling-now</link><guid isPermaLink="false">https://engineering.mindlinksoft.comautomate-your-memory-profiling-now</guid><pubDate>Wed, 17 Apr 2019 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;MindLink’s core product is designed to be a long running and stable server brokering between clients and chat systems. Stability is paramount to ensure users have an optimal experience. We have a large number of automated tests, exploratory and planned manual QA processes and we dogfood our products with nightly builds.&lt;/p&gt;
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Engineering at MindLink]]></title><description><![CDATA[Insights and musings from the MindLink software engineers]]></description><link>https://engineering.mindlinksoft.com</link><generator>RSS for Node</generator><lastBuildDate>Tue, 25 Jun 2019 13:08:50 GMT</lastBuildDate><item><title><![CDATA[Rebuilding a performant emoji picker in React with hooks]]></title><description><![CDATA[Before I start, we didn’t really want to have to do this. There are a couple of really good projects out there that offer an emoji picker…]]></description><link>https://engineering.mindlinksoft.comrebuilding-a-performant-emoji-picker-in-react-with-hooks</link><guid isPermaLink="false">https://engineering.mindlinksoft.comrebuilding-a-performant-emoji-picker-in-react-with-hooks</guid><pubDate>Thu, 23 May 2019 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;Before I start, we didn’t really want to have to do this. There are a couple of really good projects out there that offer an emoji picker, they just didn’t &lt;em&gt;quite&lt;/em&gt; work how we needed them to.&lt;/p&gt;
+&lt;h2&gt;TL;DR&lt;/h2&gt;
+&lt;p&gt;It is surprisingly easy to build out a complex component with React and hooks. However, you have to be careful about accessibility and profile the performance routinely!&lt;/p&gt;
+&lt;p&gt;In a couple of days we managed to put together a performant and feature-rich emoji picker UX that supports down to IE 10 using &lt;a href=&quot;https://reactjs.org/&quot;&gt;React&lt;/a&gt;, &lt;a href=&quot;https://reactjs.org/docs/hooks-intro.html&quot;&gt;hooks&lt;/a&gt;, &lt;a href=&quot;https://github.com/bvaughn/react-window&quot;&gt;react-window&lt;/a&gt; and an emoji data source!&lt;/p&gt;
+&lt;h2&gt;Background&lt;/h2&gt;
+&lt;p&gt;As you perhaps already know one of MindLink’s core products is a single page application for accessing chat systems.&lt;/p&gt;
+&lt;p&gt;We support legacy chat systems from a time where emojis were not a mainstream expectation from users. We bring up to date emoji support to those chat systems via our server-side abstraction layer, which allows us to build modern features on top of existing Enterprise chat systems.&lt;/p&gt;
+&lt;p&gt;To bring emoji support to our clients we originally we went with &lt;a href=&quot;https://github.com/missive/emoji-mart&quot;&gt;emoji-mart&lt;/a&gt; by missive. It’s sleek and stylish and has a lot of customisation options. However, we encountered some issues with performance:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;On IE10/11 the showing of the picker is slooww as it struggles to render all 2000+ emojis into the DOM&lt;/li&gt;
+&lt;li&gt;Even in modern browsers there’s a noticeable delay&lt;/li&gt;
+&lt;li&gt;The use of a large sprite sheet results in browsers having to reset their graphics context so switching back to a tab with the picker open results in a brief white screen&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Additionally, we really wanted to customise it in other ways:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Inject the search term as a prop to make it work with our message input&lt;/li&gt;
+&lt;li&gt;To forward on keyboard events to move the selected emojis/trigger selection&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;What we didn’t need:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Customisable source (we opted for Twitter, we don’t need the overhead of supporting other emoji icons)&lt;/li&gt;
+&lt;li&gt;Custom emojis (at least not yet)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Moving to a virtualized list&lt;/h2&gt;
+&lt;p&gt;We knew from performance profiling that the biggest issue is the rendering of the emoji list. 2000+ emojis on screen at once, not a good idea. We need a better way - a virtualised list.&lt;/p&gt;
+&lt;p&gt;Simply put, a virtualised list only renders what is visible into the DOM on demand and tracks scroll position to trigger loading different parts of the list. This means the complete list is virtual and we render only a window.&lt;/p&gt;
+&lt;p&gt;A well-established solution in the React world is &lt;a href=&quot;https://github.com/bvaughn/react-window&quot;&gt;react-window&lt;/a&gt;. It is a great project that handles most of the pain of managing a virtualised list or grid. There is also the possibility to get some vanilla JS to do this using an &lt;code class=&quot;language-text&quot;&gt;IntersectionObserver&lt;/code&gt; to trigger rendering “pages”.&lt;/p&gt;
+&lt;p&gt;We are also fortunate that right now it’s pretty easy to make lightweight components using React hooks.&lt;/p&gt;
+&lt;p&gt;Combining both react-window and hooks we sought to recreate the minimal feature set we wanted from emoji-mart:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Category icon buttons allow you to jump to categories and also highlight what category you’re currently viewing&lt;/li&gt;
+&lt;li&gt;Inline category headers separating groups of emojis&lt;/li&gt;
+&lt;li&gt;A larger preview of a highlighted emoji showing the shortcode, description and ASCII art equivalents&lt;/li&gt;
+&lt;li&gt;A skin variation picker to select a skin tone&lt;/li&gt;
+&lt;li&gt;Search to filter the emojis&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;A look at the finished picker&lt;/h2&gt;
+&lt;p&gt;A first draft of this we threw together in about half a day - leveraging the emoji-mart data source so that we didn’t have to worry about compiling that. That is the power of leveraging hooks and react-window.&lt;/p&gt;
+&lt;p&gt;We took that first draft, liked it and built it out over another couple of days to get it to where we wanted it for production.&lt;/p&gt;
+&lt;p&gt;
+  &lt;a
+    class=&quot;gatsby-resp-image-link&quot;
+    href=&quot;/static/picker-tone-32f2c7748747621aabad37edd831bff1-0904b.png&quot;
+    style=&quot;display: block&quot;
+    target=&quot;_blank&quot;
+    rel=&quot;noopener&quot;
+  &gt;
+  
+  &lt;span
+    class=&quot;gatsby-resp-image-wrapper&quot;
+    style=&quot;position: relative; display: block; ; max-width: 398px; margin-left: auto; margin-right: auto;&quot;
+  &gt;
+    &lt;span
+      class=&quot;gatsby-resp-image-background-image&quot;
+      style=&quot;padding-bottom: 103.26633165829145%; position: relative; bottom: 0; left: 0; background-image: url(&apos;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAVCAYAAABG1c6oAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAENElEQVQ4y4WVSY/bRhCF9bvzC3I0kGtOOeTmg2EgcOxk7Alsy/Es2kWJEhdxFTeRlLhImhl/qaY8QW4RVOrWY3d19auqx15WZJjpmvJQEvgBYRiy3+9xXZfD4YDv+wRB0GGe53VYFEWkaUqe5ziO02Fqjdrbi/KQvn9NXu1Yr9aYlklZlpim2S3UNA1d19ntdtzd3XWYYRjdgQobj8f/BrDZbOilSUomp1VVJXboxsNh321UdsGry1xhsrl6nv/H6rruxl4cR2y8iMcnePp2Mfl2o/zKXB5cEJ4/j9+Nb90inp4uz47HI71DfabWf6WO52z134lDuc7kNZn3hUk/wZpHLG5cTK1Af/cby6s/ift3RF/vcKKYhdCUpBnWxu2i7u2rlpP3mbYIaLMZReZTpTOavU1i5pRhTugdSJIWb6rjzA0ay6fZBGRVI85K8lpG8ZPEMb1a+HGjnHxfMdPFiRCtjX22dsK15TEMEw7LAamxpo4+Uod98uCW3Llm59wSbd7TjO6p/3hJdTrRU4Rv072UTY0TZuzEsWNnZOGOftgwy87k2pR4ZVEmC4poKaNBGWlsYxcnWAldDoU1pG6Fw0rCLZYvZcGS2n5DE41pgz7HwqQwr2R+S+n3qZI7sqWUz3rJzjJIlxp716bUNSLXwh5+oT2dFYcNp1j+7IW76J4m31B4A9qdjb9dc8hMqngiuE5h6JS2TmYsSLQRhWOy02fkkU+0GtOoCNu2ZTyaEMUp809/sXU26Ldf8dc6q8VCCtbDGA1w9CXGdIg+uOnqNS9yEmfNdj1lKx2y1ma0qmwacWjNBmRJhD+9Ee5c3PEtsb0msFakoUe0log8C0cc2uN7iiQk8zdSWhaxOScJZI9E3BwlKXXT4K6EbMnuZiXXylJsUyeWErD0OYG0lKbfEsr19NVIsAllXkgpOZRFwVZ6uEwTtovJ9yuLw9FyRZTljCZTwihhNR8SBh7L4T2uYWJbU7Kty2o6YTPRiCUiazkn8j3W86nQFaAth5crV01LKBHuZFGR7+TUnCzaSqQJbpLhxXJ6LNF7IcGuRJfSCqX/B4bHLo3xbJNMbmfMJULx1Tsez9z8fY0t2YusdcelJyWhuNPWEp3I00LUZikJ0tyAe93EkDZ7P5jjSzJmkwlBkvDhU//Sy4VoWitkVqIWyg5KWaQ2Dy1UzbGb18cHmtOj1NmDiMg3zmJKFlRTqKQqlVH8Kdnr7b/L0bM8VVKXVRHTuq9pko2Y9PhWI7dnxPqQ2Zf3TD9/YPDhbefkWeqUn06+FNBIYi5Wy6IzbenxOP+Bh2AkZvBoX7EbvsX7+IqrX17w5ucXvPrpR86ieUoHn/eriKVTTtRCZl1X3cOLyTWb8wVv1PzY9amKSLXX8XzmdH7onDzvUQ3SOWySOW114VGB/28NRxkVX+q9ojCVDPU6UNg/5CUZ8YDCaO8AAAAASUVORK5CYII=&apos;); background-size: cover; display: block;&quot;
+    &gt;
+      &lt;img
+        class=&quot;gatsby-resp-image-image&quot;
+        style=&quot;width: 100%; height: 100%; margin: 0; vertical-align: middle; position: absolute; top: 0; left: 0; box-shadow: inset 0px 0px 0px 400px white;&quot;
+        alt=&quot;Emoji picker with skin tone&quot;
+        title=&quot;&quot;
+        src=&quot;/static/picker-tone-32f2c7748747621aabad37edd831bff1-0904b.png&quot;
+        srcset=&quot;/static/picker-tone-32f2c7748747621aabad37edd831bff1-7c835.png 148w,
+/static/picker-tone-32f2c7748747621aabad37edd831bff1-11b18.png 295w,
+/static/picker-tone-32f2c7748747621aabad37edd831bff1-0904b.png 398w&quot;
+        sizes=&quot;(max-width: 398px) 100vw, 398px&quot;
+      /&gt;
+    &lt;/span&gt;
+  &lt;/span&gt;
+  
+  &lt;/a&gt;
+    &lt;/p&gt;
+&lt;p&gt;
+  &lt;a
+    class=&quot;gatsby-resp-image-link&quot;
+    href=&quot;/static/picker-preview-fa3fdceab79f58afba33fe9edcf15e3f-5d328.png&quot;
+    style=&quot;display: block&quot;
+    target=&quot;_blank&quot;
+    rel=&quot;noopener&quot;
+  &gt;
+  
+  &lt;span
+    class=&quot;gatsby-resp-image-wrapper&quot;
+    style=&quot;position: relative; display: block; ; max-width: 399px; margin-left: auto; margin-right: auto;&quot;
+  &gt;
+    &lt;span
+      class=&quot;gatsby-resp-image-background-image&quot;
+      style=&quot;padding-bottom: 102.75689223057644%; position: relative; bottom: 0; left: 0; background-image: url(&apos;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAVCAIAAADJt1n/AAAACXBIWXMAAA7DAAAOwwHHb6hkAAADU0lEQVQ4y41US2/cNhDWv+n/6z/oucf20EsuRR8w0iRFnLZ2W7tx4sSOY/ix2fVm1ytKlLR6kxTJGVI24nVnrboweuoHaDRPzlDkpwAQKl0AWill27aISBIAuq4jxTlHfnKSqZT6N0pOMoPOqjf5rsA2jvhsNqPsMAyNMYyx0WhEecfHx1SZZRl5qPj8/JzM5XJJaQGtkVXpsDCBFCEESfIPCrUaokO3pmmGNEKgpEp5enNzc3t7u7rD7f8DlQTWWq01zUMDD3JQCHAHvMdDnXLWnWkMfociL6IoChlL02wdRux73/f9ffYDieido5YBfRtrDW0D6EXoJJjOU/Dqum7qsiyonkw/PJ6Wo9g/VuCubuX0W5u/79gLzF6n4V4W7efsYHK2e7j9zV+Pv6jCPb34CapTNvlZFx/q0SMn5mr0te+vAxpBiwR0Y2QBpq6kaJSsW9mJ+vLj+Xj0zqjaiAyM6NoUjFRt7LADxah1AP0KJhuYndj4RZ/u8/FWNN+5ersFe89dc2Anz1x9jOyJa0Yu2sByasffY8P02SPvrwOgzbfM6Rpkgm0OKkGVGbk0gju6eQVztnIqdrZBFXotsWLOKFfOnesD8CvLNqA+AfYblod28qudbGF+gMlLWxwq9gtUJxA/9+0Yomcophj9iF1qyeOpGHsUMzSlLy/6loGIreBecq9S1EsnQ9QFyoUztZdzb5tezhwoLy/Xe0a/MovH9DFV9LvJ3zX8VZe+hvyNTXexOu74n7Y40WwT24kIN7vyopn8QLuIR985f0Wdr1w7djqzzUeQcdVyKyOnIhCX2GVdG7oug2bqdN5UM6tKlZ95aKE6czQ2+k+GbUI9svE+5KcuO7LFRKdHlh9gfWrSl7YaW75d06LZjpcLOhSvU4yfrs/Z4CdbvAcV6+gM8rnNLmwxN8up5WNQl7b+gGIBJSUkXXZgRazTV1Zmmu9YwIAujTz8XITbSaEWLGY8jZOMZ3kYpzFfLsKEJ8uI53Gc0Ix0rvfyhngSmOSPt199tjz6Mkry6cW4yJeCGNw2oiXK1FVZEJHpTdz2bk2MgRUOYX23iQ9dPtKq4kmaJBzXZOr9PQa9v4MbCPEAgQXor1fo+oGuD0n7HxDz6WcyJBD9SPkbkJuAO7JG2eEAAAAASUVORK5CYII=&apos;); background-size: cover; display: block;&quot;
+    &gt;
+      &lt;img
+        class=&quot;gatsby-resp-image-image&quot;
+        style=&quot;width: 100%; height: 100%; margin: 0; vertical-align: middle; position: absolute; top: 0; left: 0; box-shadow: inset 0px 0px 0px 400px white;&quot;
+        alt=&quot;Emoji picker with preview&quot;
+        title=&quot;&quot;
+        src=&quot;/static/picker-preview-fa3fdceab79f58afba33fe9edcf15e3f-5d328.png&quot;
+        srcset=&quot;/static/picker-preview-fa3fdceab79f58afba33fe9edcf15e3f-be17d.png 148w,
+/static/picker-preview-fa3fdceab79f58afba33fe9edcf15e3f-7298c.png 295w,
+/static/picker-preview-fa3fdceab79f58afba33fe9edcf15e3f-5d328.png 399w&quot;
+        sizes=&quot;(max-width: 399px) 100vw, 399px&quot;
+      /&gt;
+    &lt;/span&gt;
+  &lt;/span&gt;
+  
+  &lt;/a&gt;
+    &lt;/p&gt;
+&lt;p&gt;The results are impressive considering the short time frame. The picker loads considerable faster and supports all the same use cases we had. We now have the full benefits of owning that:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;We can style it totally how we like&lt;/li&gt;
+&lt;li&gt;We can add extra features specific to our use cases&lt;/li&gt;
+&lt;li&gt;We can keep it as up to date as we need it (hello Unicode 12)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;We want to take this open-source, but before we do we need to figure out a first-class data source and stop piggy-backing off of emoji-mart so we can control the Unicode support.&lt;/p&gt;
+&lt;p&gt;I’ll take a deep-dive into the implementation in a few follow-up posts.&lt;/p&gt;</content:encoded></item><item><title><![CDATA[Automate your memory profiling now]]></title><description><![CDATA[MindLink’s core product is designed to be a long running and stable server brokering between clients and chat systems. Stability is…]]></description><link>https://engineering.mindlinksoft.comautomate-your-memory-profiling-now</link><guid isPermaLink="false">https://engineering.mindlinksoft.comautomate-your-memory-profiling-now</guid><pubDate>Wed, 17 Apr 2019 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;MindLink’s core product is designed to be a long running and stable server brokering between clients and chat systems. Stability is paramount to ensure users have an optimal experience. We have a large number of automated tests, exploratory and planned manual QA processes and we dogfood our products with nightly builds.&lt;/p&gt;
 &lt;p&gt;Combined, these strategies have ensured that our products continue to be scalable, reliable and high quality. But we can do better!&lt;/p&gt;
 &lt;p&gt;Recently we discovered a memory leak late into the QA and release process and this made it out into customer hands. Not ideal, but these things happen. The leak itself has implications when lots of users log on and log out over time and will eventually cause the process to run out of memory.&lt;/p&gt;
 &lt;h2&gt;TL;DR&lt;/h2&gt;
